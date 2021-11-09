@@ -30,6 +30,20 @@ SquareOne.Position = Vector2(ScreenSize.X/2, ScreenSize.Y/2)
 SquareOne.Size = Vector2(400, 400)
 SquareOne.Anchor = Vector2(.5, .5)
 
+-- Sound test
+local passSound = "assets/sounds/good.ogg"
+Controls.bind("e", function(inputBegan)
+    if not inputBegan then return end
+    love.audio.newSource(passSound, "static"):play()
+end)
+
+local wrongSound = {"assets/sounds/bad_voice_1.ogg", "assets/sounds/bad_voice_2.ogg", "assets/sounds/bad_voice_3.ogg"}
+Controls.bind("r", function(inputBegan)
+    if not inputBegan then return end
+    love.audio.newSource(wrongSound[math.random(1, #wrongSound)], "static"):play()
+end)
+
+-- burst shit
 local Burst, BurstTick = 0, 0
 
 local ProgressBarOutline = Square(ScreenSize.X/2, ScreenSize.Y*.8, ScreenSize.X*.75, 25)
@@ -48,6 +62,7 @@ function love.load()
 
     MusicSource = love.audio.newSource(MusicPath, "static")
     MusicSource:setLooping(true)
+    MusicSource:setVolume(0.1)
     MusicSource:play()
 end
 
