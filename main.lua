@@ -16,8 +16,9 @@ local BackgroundColor = Color(.05, .05, .05)
 local ProgressbarColor = Color(0.2,0.8,0.2)
 local ProgressbarBurst = Color(0.8,0.8,0.8)
 
-local MusicPath = "assets/musics/Genocide.ogg"
-local MusicBPM = 213
+local MusicPath = "assets/sounds/lol.mp3" --"assets/musics/Genocide.ogg"
+local MusicBPM = 151 -- 213
+local MusicStepSkip = 1
 
 local GameSpeed = 1
 
@@ -84,17 +85,13 @@ end
 function love.update(dt)
     if love.keyboard.isDown("up") then GameSpeed = GameSpeed + .3*dt end
     if love.keyboard.isDown("down") then GameSpeed = GameSpeed - .3*dt end
+    if love.keyboard.isDown("right") then MusicSource:setVolume(MusicSource:getVolume() + .3 * dt) end
+    if love.keyboard.isDown("left") then MusicSource:setVolume(MusicSource:getVolume() - .3 * dt) end
     MusicSource:setPitch(GameSpeed)
     
     local tick = MusicSource:tell("seconds") --love.timer.getTime()
 
-    offx = math.sin(tick*1)*10
-    offy = math.sin(tick*2)*10
-
-    Progress = math.max(math.min(Progress + dt * .1, 1), 0.02)
-    ProgressBar.Size.X = ScreenSize.X*(.75 * Progress)
-
-    local db = math.floor(tick*(MusicBPM/60)/4)
+    local db = math.floor(tick*(MusicBPM/60)/MusicStepSkip)
     if Burst ~= db then
         Burst = db
         BurstTick = tick
@@ -108,6 +105,10 @@ function love.update(dt)
     SquareOne.Size.Y = 400 * SizeFactor + math.sin(tick*2)*50
     --SquareOne.Size.X = 400 + math.sin(tick*2)*50
     --SquareOne.Size.Y = 400 + math.sin(tick*2)*50
+
+    Progress = math.max(math.min(Progress + math.max((1-Elapsed)*.05*dt, 0), 1), 0.02) --math.max(math.min(Progress + dt * .1, 1), 0.02)
+    if Progress == 1 then Progress = 0 end
+    ProgressBar.Size.X = ScreenSize.X*(.75 * Progress)
 
     -- LOGS
 
