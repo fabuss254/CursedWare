@@ -1,7 +1,43 @@
+-- LIB
+local EventConnection = require("src/classes/EventConnection")
+
+-- MODULE
 local module = {}
 
-function module.keyPushed()
+-- PRIVATE VARIABLES
+local binds = {}
 
+-- METHODS
+function module.isHolding(key)
+    return love.keyboard.isDown(key)
+end
+
+function module.bind(key, callback)
+    if not binds[key] then binds[key] = {} end
+
+    -- Set the key's connection and a disconnection function so we can disconnect it anytime.
+    local con = EventConnection(callback, function()
+        for i,v in pairs(binds[key]) do
+            binds[key][i] = nil
+        end
+    end)
+
+    -- Insert it inside the bind
+    table.insert(binds[key], con)
+    return con
+end
+
+-- EVENTS
+function love.keypressed(key, scancode, isRepeat)
+    for _,con in pairs(binds[key] or {}) do
+        con:fire(true)
+    end
+end
+
+function love.keyreleased(key, scancode)
+    for _,con in pairs(binds[key] or {}) do
+        con:fire(false)
+    end
 end
 
 return module

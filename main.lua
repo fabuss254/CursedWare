@@ -1,7 +1,9 @@
 -- Libs
+local Object = require("src/libs/Classic")
 local Vector2 = require("src/classes/Vector2")
 local Square = require("src/classes/Rect")
 
+local Controls = require("src/libs/Controls")
 local Instance = require("src/libs/Instance")
 
 -- Settings
