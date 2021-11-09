@@ -3,6 +3,7 @@ local EventConnection = require("src/classes/EventConnection")
 
 -- MODULE
 local module = {}
+module.LastInput = ""
 
 -- PRIVATE VARIABLES
 local binds = {}
@@ -29,6 +30,7 @@ end
 
 -- EVENTS
 function love.keypressed(key, scancode, isRepeat)
+    module.LastInput = key
     for _,con in pairs(binds[key] or {}) do
         con:fire(true)
     end

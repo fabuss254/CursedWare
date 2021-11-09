@@ -32,6 +32,18 @@ function class:applyBackground()
     love.graphics.setBackgroundColor(self.R, self.G, self.B)
 end
 
+function class:lerp(Color, Alpha)
+    Alpha = math.min(math.max(Alpha, 0), 1)
+    if Alpha == 0 then return self end
+    if Alpha == 1 then return Color end
+    return class(
+        (1-Alpha) * self.R + Color.R*Alpha,
+        (1-Alpha) * self.G + Color.G*Alpha,
+        (1-Alpha) * self.B + Color.B*Alpha,
+        (1-Alpha) * self.A + Color.A*Alpha
+    )
+end
+
 -- METATABLES
 function class:__tostring()
     return string.format("Color(%i, %i, %i, %i)", self.R, self.G, self.B, self.A)
