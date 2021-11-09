@@ -29,6 +29,7 @@ end
 
 -- EVENTS
 function love.keypressed(key, scancode, isRepeat)
+    print("PRESSED", key)
     for _,con in pairs(binds[key] or {}) do
         con:fire(true)
     end
