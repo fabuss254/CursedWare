@@ -10,16 +10,12 @@ local Instance = require("src/libs/Instance")
 
 -- Settings
 local ScreenSize = Vector2(1280, 1024)
+local BackgroundColor = Color(.05, .05, .05)
 
 -- Debug shit
 local offx, offy = 0, 0
 local SquareOne = Square(ScreenSize.X/2, ScreenSize.Y/2, 100, 100)
 SquareOne.Anchor = Vector2(.5, .5)
-
-LogManager.addLog("FPSCounter", "- FPS", Color(0, 1, 0))
-LogManager.addLog("b1", nil, Color(0, 1, 0))
-LogManager.addLog("b2", nil, Color(0, 1, 0))
-LogManager.addLog("b3", nil, Color(0, 1, 0))
 
 -- Functions
 function love.load()
@@ -32,14 +28,18 @@ function love.draw()
     love.graphics.setColor(1, 0, 0, .5)
     love.graphics.circle("fill", ScreenSize.X/2, ScreenSize.Y/2, 5)
 
+    BackgroundColor:applyBackground()
     LogManager.draw()
 end
 
 function love.update(dt)
-    LogManager.updateLog("FPSCounter", love.timer.getFPS() .. " FPS")
-    LogManager.updateLog("b1", "Position: " .. tostring(SquareOne.Position))
-    LogManager.updateLog("b2", "Size: " .. tostring(SquareOne.Size))
-    LogManager.updateLog("b3", "Rotation: " .. tostring(SquareOne.Rotation))
+    LogManager.cleanup()
+    LogManager.updateLog(love.timer.getFPS() .. " FPS", Color.Green)
+    LogManager.updateLog("Position: " .. tostring(SquareOne.Position), Color.Green)
+    LogManager.updateLog("Size: " .. tostring(SquareOne.Size), Color.Green)
+    LogManager.updateLog("Rotation: " .. tostring(SquareOne.Rotation), Color.Green)
+    LogManager.updateLog()
+    LogManager.updateLog("Hi! :)", Color.White)
 
     if love.keyboard.isDown("up") then SquareOne.Size = SquareOne.Size + Vector2(100,100)*dt end
     if love.keyboard.isDown("down") then SquareOne.Size = SquareOne.Size - Vector2(100,100)*dt end

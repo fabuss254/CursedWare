@@ -9,24 +9,17 @@ local module = {}
 local logs = {}
 
 -- METHODS
-function module.addLog(name, text, color)
-    assert(Instance.typeof(color) == "Color", "Invalid argument #3 (Expected Color, got " .. Instance.typeof(color) .. ")")
+function module.updateLog(text, color)
+    assert(not color or (Instance.typeof(color) == "Color"), "Invalid argument #2 (Expected Color, got " .. Instance.typeof(color) .. ")")
 
-    logs[name] = {
+    table.insert(logs, {
         text = text or "",
-        color = color
-    }
+        color = color or Color.White
+    })
 end
 
-function module.remLog(name)
-    logs[name] = nil
-end
-
-function module.updateLog(name, text, color)
-    assert(not color or (Instance.typeof(color) == "Color"), "Invalid argument #3 (Expected Color, got " .. Instance.typeof(color) .. ")")
-
-    logs[name].text = text
-    logs[name].color = color or logs[name].color
+function module.cleanup()
+    logs = {}
 end
 
 function module.getLogs()
@@ -36,7 +29,7 @@ end
 function module.draw()
     local num = 0
     for _,v in pairs(logs) do
-        v.color:Apply()
+        v.color:apply()
         love.graphics.print(v.text, 10, 10 + num*11)
 
         num = num + 1

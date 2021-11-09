@@ -16,9 +16,20 @@ function class:new(R, G, B, A)
     return self
 end
 
+-- STATICS
+class.Red = class(1, 0, 0)
+class.Green = class(0, 1, 0)
+class.Blue = class(0, 0, 1)
+class.White = class(1, 1, 1)
+class.Black = class(0, 0, 0)
+
 -- METHODS
-function class:Apply()
+function class:apply()
     love.graphics.setColor(self.R, self.G, self.B, self.A)
+end
+
+function class:applyBackground()
+    love.graphics.setBackgroundColor(self.R, self.G, self.B)
 end
 
 -- METATABLES
