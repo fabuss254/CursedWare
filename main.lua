@@ -81,6 +81,7 @@ end
 function love.draw()
     love.graphics.setShader(Shader3dRays)
     SquareOne:draw()
+    love.graphics.setShader()
     ProgressBarOutline:draw()
     ProgressBar:draw()
 
