@@ -58,8 +58,25 @@ ProgressBar.CornerRadius = 10
 ProgressBar.Color = ProgressbarColor
 
 -- Functions
+local Shader3dRays
 function love.load()
     love.window.setMode(ScreenSize.X, ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
+    Shader3dRays = love.graphics.newShader([[
+        extern number aberration = 2.0;
+
+vec4 effect(vec4 color, Image tx, vec2 tc, vec2 pc)
+{
+  // fake chromatic aberration
+  float sx = aberration/love_ScreenSize.x;
+  float sy = aberration/love_ScreenSize.y;
+  vec4 r = Texel(tx, vec2(tc.x + sx, tc.y - sy));
+  vec4 g = Texel(tx, vec2(tc.x, tc.y + sy));
+  vec4 b = Texel(tx, vec2(tc.x - sx, tc.y - sy));
+  number a = (r.a + g.a + b.a)/3.0;
+
+  return vec4(r.r, g.g, b.b, a);
+}
+    ]])
 
     MusicSource = love.audio.newSource(MusicPath, "static")
     MusicSource:setLooping(true)
@@ -68,6 +85,7 @@ function love.load()
 end
 
 function love.draw()
+    love.graphics.setShader(Shader3dRays)
     SquareOne:draw()
     ProgressBarOutline:draw()
     ProgressBar:draw()
