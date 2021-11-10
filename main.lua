@@ -26,7 +26,7 @@ local GameSpeed = 1
 local offx, offy = 0, 0
 local Progress = 0
 local MusicSource
-local SquareOne = Image("assets/imgs/studiologoNoBG.png")
+local SquareOne = Image("assets/imgs/StudioLogoNoBG.png")
 SquareOne.Position = Vector2(ScreenSize.X/2, ScreenSize.Y/2)
 SquareOne.Size = Vector2(400, 400)
 SquareOne.Anchor = Vector2(.5, .5)
