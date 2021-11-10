@@ -61,16 +61,9 @@ ProgressBar.Color = ProgressbarColor
 local Shader3dRays
 function love.load()
     love.window.setMode(ScreenSize.X, ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
-    Shader3dRays = love.graphics.newShader([[
-        extern number time;
-        number t;
-        vec4 effect(vec4 color, Image tex, vec2 tc, vec2 pc)
-        {
-            t = time * 1.5; //may want to vary this for cycle speed?
-            color = Texel(tex, tc);
-            return vec4(vec3(sin(t + 5.0)+0.3, -sin(t+5)+0.3, sin(t + 10.0)) * (max(color.r, max(color.g, color.b))), color.a); //cycles colors and pulses brightness slightly
-        }
-    ]])
+    
+    local ShaderString = love.filesystem.read("assets/shaders/Multicolor.glsl")
+    Shader3dRays = love.graphics.newShader(ShaderString)
 
     MusicSource = love.audio.newSource(MusicPath, "static")
     MusicSource:setLooping(true)
