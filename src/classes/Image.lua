@@ -16,11 +16,14 @@ function class:draw()
     local TextureWidth, TextureHeight = self.Texture:getDimensions()
 
     self.Color:apply()
+    if self.Shader then love.graphics.setShader(self.Shader) end
+
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)
     love.graphics.translate(-ScaleX, -ScaleY)
     love.graphics.draw(self.Texture, 0, 0, 0, self.Size.X/TextureWidth, self.Size.Y/TextureHeight)
     love.graphics.origin()
+    if self.Shader then love.graphics.setShader() end
 end
 
 return class

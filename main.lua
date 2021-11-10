@@ -5,13 +5,14 @@ local Color = require("src/classes/Color")
 local Square = require("src/classes/Rect")
 local Image = require("src/classes/Image")
 
+local Renderer = require("src/libs/Rendering/Renderer")
 local LogManager = require("src/libs/Debug/LogManager")
 local Controls = require("src/libs/Controls")
 local Instance = require("src/libs/Instance")
 
 -- Settings
-local ScreenSize = Vector2(1280, 1024)
-local BackgroundColor = Color(.05, .05, .05)
+Renderer.ScreenSize = Vector2(1280, 1024)
+Renderer.BackgroundColor = Color(.05, .05, .05)
 
 local ProgressbarColor = Color(0.2,0.8,0.2)
 local ProgressbarBurst = Color(0.8,0.8,0.8)
@@ -27,9 +28,10 @@ local offx, offy = 0, 0
 local Progress = 0
 local MusicSource
 local SquareOne = Image("assets/imgs/StudioLogoNoBG.png")
-SquareOne.Position = Vector2(ScreenSize.X/2, ScreenSize.Y/2)
+SquareOne.Position = Vector2(Renderer.ScreenSize.X/2, Renderer.ScreenSize.Y/2)
 SquareOne.Size = Vector2(400, 400)
 SquareOne.Anchor = Vector2(.5, .5)
+Renderer.add(SquareOne)
 
 -- Sound test
 local passSound = "assets/sounds/good.ogg"
@@ -47,23 +49,26 @@ end)
 -- burst shit
 local Burst, BurstTick = 0, 0
 
-local ProgressBarOutline = Square(ScreenSize.X/2, ScreenSize.Y*.8, ScreenSize.X*.75, 25)
+local ProgressBarOutline = Square(Renderer.ScreenSize.X/2, Renderer.ScreenSize.Y*.8, Renderer.ScreenSize.X*.75, 25)
 ProgressBarOutline.Anchor = Vector2(.5, .5)
 ProgressBarOutline.CornerRadius = 10
 ProgressBarOutline.Color = Color(0.2,0.2,0.2)
+Renderer.add(ProgressBarOutline)
 
-local ProgressBar = Square(ScreenSize.X*.125, ScreenSize.Y*.8, 0--[[ScreenSize.X*.25]], 25)
+local ProgressBar = Square(Renderer.ScreenSize.X*.125, Renderer.ScreenSize.Y*.8, 0, 25)
 ProgressBar.Anchor = Vector2(0, .5)
 ProgressBar.CornerRadius = 10
 ProgressBar.Color = ProgressbarColor
+Renderer.add(ProgressBar)
 
 -- Functions
 local Shader3dRays
 function love.load()
-    love.window.setMode(ScreenSize.X, ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
+    love.window.setMode(Renderer.ScreenSize.X, Renderer.ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
     
-    local ShaderString = love.filesystem.read("assets/shaders/SphericalShader.glsl")
+    local ShaderString = love.filesystem.read("assets/shaders/Bloom.glsl")
     Shader3dRays = love.graphics.newShader(ShaderString)
+    SquareOne.Shader = Shader3dRays
 
     MusicSource = love.audio.newSource(MusicPath, "static")
     MusicSource:setLooping(true)
@@ -71,6 +76,7 @@ function love.load()
     MusicSource:play()
 end
 
+--[[
 function love.draw()
     love.graphics.setShader(Shader3dRays)
     SquareOne:draw()
@@ -87,16 +93,20 @@ function love.draw()
     BackgroundColor:applyBackground()
     LogManager.draw()
 end
+]]
 
+local b = 0
 function love.update(dt)
     if love.keyboard.isDown("up") then GameSpeed = GameSpeed + .3*dt end
     if love.keyboard.isDown("down") then GameSpeed = GameSpeed - .3*dt end
     if love.keyboard.isDown("right") then MusicSource:setVolume(MusicSource:getVolume() + .3 * dt) end
     if love.keyboard.isDown("left") then MusicSource:setVolume(MusicSource:getVolume() - .3 * dt) end
+    --if love.keyboard.isDown("p") then b = b + dt * .3 Shader3dRays:send("intensity", b) end
+    --if love.keyboard.isDown("l") then b = b - dt * .3 Shader3dRays:send("intensity", b) end
     MusicSource:setPitch(GameSpeed)
     
     local tick = MusicSource:tell("seconds") --love.timer.getTime()
-    Shader3dRays:send("time", tick)
+    --Shader3dRays:send("time", tick)
 
     local db = math.floor(tick*(MusicBPM/60)/MusicStepSkip)
     if Burst ~= db then
@@ -110,12 +120,13 @@ function love.update(dt)
     local SizeFactor = 1 + math.max(1-Elapsed/(.25 / GameSpeed), 0)*.25
     SquareOne.Size.X = 400 * SizeFactor + math.sin(tick*2)*50
     SquareOne.Size.Y = 400 * SizeFactor + math.sin(tick*2)*50
+    Shader3dRays:send("intensity", math.max(1 - Elapsed/.25, 0)*1)
     --SquareOne.Size.X = 400 + math.sin(tick*2)*50
     --SquareOne.Size.Y = 400 + math.sin(tick*2)*50
 
     Progress = math.max(math.min(Progress + math.max((1-Elapsed)*.05*dt, 0), 1), 0.02) --math.max(math.min(Progress + dt * .1, 1), 0.02)
     if Progress == 1 then Progress = 0 end
-    ProgressBar.Size.X = ScreenSize.X*(.75 * Progress)
+    ProgressBar.Size.X = Renderer.ScreenSize.X*(.75 * Progress)
 
     -- LOGS
 
