@@ -68,7 +68,7 @@ function love.load()
         {
             t = time * 1.5; //may want to vary this for cycle speed?
             color = Texel(tex, tc);
-            return vec4(vec3(sin(t + 5)+0.3, -sin(t+5)+0.3, sin(t + 10)) * (max(color.r, max(color.g, color.b))), 1.0); //cycles colors and pulses brightness slightly
+            return vec4(vec3(sin(t + 5.0)+0.3, -sin(t+5)+0.3, sin(t + 10.0)) * (max(color.r, max(color.g, color.b))), color.a); //cycles colors and pulses brightness slightly
         }
     ]])
 
