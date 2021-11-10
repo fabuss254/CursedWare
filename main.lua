@@ -62,7 +62,7 @@ local Shader3dRays
 function love.load()
     love.window.setMode(ScreenSize.X, ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
     
-    local ShaderString = love.filesystem.read("assets/shaders/Multicolor.glsl")
+    local ShaderString = love.filesystem.read("assets/shaders/SphericalShader.glsl")
     Shader3dRays = love.graphics.newShader(ShaderString)
 
     MusicSource = love.audio.newSource(MusicPath, "static")
