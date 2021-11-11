@@ -4,6 +4,7 @@ local Vector2 = require("src/classes/Vector2")
 local Color = require("src/classes/Color")
 local Square = require("src/classes/Rect")
 local Image = require("src/classes/Image")
+local Quad = require("src/classes/Quad")
 
 local Renderer = require("src/libs/Rendering/Renderer")
 local LogManager = require("src/libs/Debug/LogManager")
@@ -17,9 +18,9 @@ Renderer.BackgroundColor = Color(.05, .05, .05)
 local ProgressbarColor = Color(0.2,0.8,0.2)
 local ProgressbarBurst = Color(0.8,0.8,0.8)
 
-local MusicPath = "assets/sounds/lol.mp3" --"assets/musics/Genocide.ogg"
-local MusicBPM = 151 -- 213
-local MusicStepSkip = 1
+local MusicPath = "assets/musics/Genocide.ogg" --"assets/sounds/lol.mp3" --"assets/musics/Genocide.ogg"
+local MusicBPM = 213 -- 151 -- 213
+local MusicStepSkip = 4
 
 local GameSpeed = 1
 
@@ -59,7 +60,14 @@ local ProgressBar = Square(Renderer.ScreenSize.X*.125, Renderer.ScreenSize.Y*.8,
 ProgressBar.Anchor = Vector2(0, .5)
 ProgressBar.CornerRadius = 10
 ProgressBar.Color = ProgressbarColor
-Renderer.add(ProgressBar)
+Renderer.add(ProgressBar, 2)
+
+local Background = Quad("assets/imgs/Backgrounds/pattern_26.png", Vector2(Renderer.ScreenSize.X + 300, Renderer.ScreenSize.Y + 300), Vector2(150, 150))
+local BackgroundSpeed = 0
+local BackgroundBaseSpeed = 60
+local BackgroundAcceleration = 30
+Background.Color = Renderer.BackgroundColor
+Renderer.add(Background, -100)
 
 -- Functions
 local Shader3dRays
@@ -72,28 +80,9 @@ function love.load()
 
     MusicSource = love.audio.newSource(MusicPath, "static")
     MusicSource:setLooping(true)
-    MusicSource:setVolume(0.1)
+    MusicSource:setVolume(0)
     MusicSource:play()
 end
-
---[[
-function love.draw()
-    love.graphics.setShader(Shader3dRays)
-    SquareOne:draw()
-    love.graphics.setShader()
-    ProgressBarOutline:draw()
-    ProgressBar:draw()
-
-    love.graphics.setColor(1, 0, 0, .5)
-    love.graphics.circle("fill", ScreenSize.X/2, ScreenSize.Y/2, 5)
-
-    love.graphics.setColor(1, 1, 1, .1)
-    love.graphics.print("ATS 2021 ©", ScreenSize.X - 80, ScreenSize.Y - 20)
-
-    BackgroundColor:applyBackground()
-    LogManager.draw()
-end
-]]
 
 local b = 0
 function love.update(dt)
@@ -127,6 +116,10 @@ function love.update(dt)
     Progress = math.max(math.min(Progress + math.max((1-Elapsed)*.05*dt, 0), 1), 0.02) --math.max(math.min(Progress + dt * .1, 1), 0.02)
     if Progress == 1 then Progress = 0 end
     ProgressBar.Size.X = Renderer.ScreenSize.X*(.75 * Progress)
+
+    BackgroundSpeed = BackgroundBaseSpeed + BackgroundAcceleration * math.max(1-Elapsed, 0)
+    Background.Position.X = ((Background.Position.X + BackgroundSpeed * dt)) % Background.TextureSize.X - Background.TextureSize.X  --% Background.TextureSize.X*2 - Background.TextureSize.X
+    Background.Position.Y = ((Background.Position.Y + BackgroundSpeed * dt)) % Background.TextureSize.Y - Background.TextureSize.Y --% Background.TextureSize.Y*2 - Background.TextureSize.Y
 
     -- LOGS
 

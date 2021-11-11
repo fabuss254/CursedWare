@@ -20,7 +20,7 @@ function module.add(obj, zIndex)
 
     table.insert(Objectpool, {obj = obj, zIndex = zIndex})
     table.sort(Objectpool, function(a, b)
-        return a.zIndex > b.zIndex
+        return a.zIndex < b.zIndex
     end)
     return true
 end
@@ -33,8 +33,21 @@ function module.rem(obj)
     end
 end
 
+--bg_image = love.graphics.newImage("assets/imgs/Backgrounds/pattern_25.png")
+--bg_image:setWrap("repeat", "repeat")
+
+-- note how the Quad's width and height are larger than the image width and height.
+--bg_quad = love.graphics.newQuad(0, 0, module.ScreenSize.X + bg_image:getWidth()*2, module.ScreenSize.Y + bg_image:getHeight()*2, bg_image:getWidth(), bg_image:getHeight())
+
+--local bg_pos = Vector2(0, 0)
+
 -- EVENTS
 function love.draw()
+    --bg_pos = bg_pos + Vector2(1, 0)
+
+    --module.BackgroundColor:apply()
+    --love.graphics.draw(bg_image, bg_quad, bg_pos.X%bg_image:getWidth() - bg_image:getWidth(), bg_pos.Y)
+
     for _,v in pairs(Objectpool) do
         v.obj:draw()
     end
