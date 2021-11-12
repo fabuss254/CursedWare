@@ -12,5 +12,5 @@ vec4 effect(vec4 color, Image texture, vec2 tc, vec2 pixel_coords)
 	uv.x = 1.0*p.x*f + 2.0 - mod(time, 4.0);
 	uv.y = 1.0*p.y*f + 0.5;
 	
-	return vec4(Texel(texture, uv).xyz, 1.0) * color;
+	return Texel(texture, uv) * color;//vec4(Texel(texture, uv).xyz, 0.5) * color;
 }

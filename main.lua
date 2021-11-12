@@ -13,14 +13,14 @@ local Instance = require("src/libs/Instance")
 
 -- Settings
 Renderer.ScreenSize = Vector2(1280, 1024)
-Renderer.BackgroundColor = Color(.05, .05, .05)
+Renderer.BackgroundColor = Color(.075, .075, .075)
 
 local ProgressbarColor = Color(0.2,0.8,0.2)
 local ProgressbarBurst = Color(0.8,0.8,0.8)
 
-local MusicPath = "assets/musics/Genocide.ogg" --"assets/sounds/lol.mp3" --"assets/musics/Genocide.ogg"
-local MusicBPM = 213 -- 151 -- 213
-local MusicStepSkip = 4
+local MusicPath = "assets/sounds/lol.mp3" --"assets/musics/Genocide.ogg"
+local MusicBPM = 151 -- 213
+local MusicStepSkip = 1
 
 local GameSpeed = 1
 
@@ -62,10 +62,10 @@ ProgressBar.CornerRadius = 10
 ProgressBar.Color = ProgressbarColor
 Renderer.add(ProgressBar, 2)
 
-local Background = Quad("assets/imgs/Backgrounds/pattern_26.png", Vector2(Renderer.ScreenSize.X + 300, Renderer.ScreenSize.Y + 300), Vector2(150, 150))
+local Background = Quad("assets/imgs/Backgrounds/pattern_57.png", Vector2(Renderer.ScreenSize.X + 200, Renderer.ScreenSize.Y + 200), Vector2(100, 100))
 local BackgroundSpeed = 0
 local BackgroundBaseSpeed = 60
-local BackgroundAcceleration = 30
+local BackgroundAcceleration = 300
 Background.Color = Renderer.BackgroundColor
 Renderer.add(Background, -100)
 
@@ -94,6 +94,7 @@ function love.update(dt)
     --if love.keyboard.isDown("l") then b = b - dt * .3 Shader3dRays:send("intensity", b) end
     MusicSource:setPitch(GameSpeed)
     
+    dt = dt * GameSpeed
     local tick = MusicSource:tell("seconds") --love.timer.getTime()
     --Shader3dRays:send("time", tick)
 
@@ -110,6 +111,7 @@ function love.update(dt)
     SquareOne.Size.X = 400 * SizeFactor + math.sin(tick*2)*50
     SquareOne.Size.Y = 400 * SizeFactor + math.sin(tick*2)*50
     Shader3dRays:send("intensity", math.max(1 - Elapsed/.25, 0)*1)
+    --Shader3dRays:send("time", tick)
     --SquareOne.Size.X = 400 + math.sin(tick*2)*50
     --SquareOne.Size.Y = 400 + math.sin(tick*2)*50
 
@@ -117,7 +119,7 @@ function love.update(dt)
     if Progress == 1 then Progress = 0 end
     ProgressBar.Size.X = Renderer.ScreenSize.X*(.75 * Progress)
 
-    BackgroundSpeed = BackgroundBaseSpeed + BackgroundAcceleration * math.max(1-Elapsed, 0)
+    BackgroundSpeed = BackgroundBaseSpeed + BackgroundAcceleration * math.max(1-Elapsed/.5, 0)
     Background.Position.X = ((Background.Position.X + BackgroundSpeed * dt)) % Background.TextureSize.X - Background.TextureSize.X  --% Background.TextureSize.X*2 - Background.TextureSize.X
     Background.Position.Y = ((Background.Position.Y + BackgroundSpeed * dt)) % Background.TextureSize.Y - Background.TextureSize.Y --% Background.TextureSize.Y*2 - Background.TextureSize.Y
 
@@ -125,6 +127,7 @@ function love.update(dt)
 
     LogManager.cleanup()
     LogManager.updateLog(love.timer.getFPS() .. " FPS", Color.Green)
+    --[[
     LogManager.updateLog("Position: " .. tostring(SquareOne.Position), Color.Green)
     LogManager.updateLog("Size: " .. tostring(SquareOne.Size), Color.Green)
     LogManager.updateLog("Rotation: " .. tostring(SquareOne.Rotation), Color.Green)
@@ -134,4 +137,5 @@ function love.update(dt)
     LogManager.updateLog()
     LogManager.updateLog("Music position: " .. tick, Color.Green)
     LogManager.updateLog("Music burst time elapsed: " .. Elapsed, Color.Green)
+    ]]
 end
