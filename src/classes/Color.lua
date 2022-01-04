@@ -24,6 +24,25 @@ class.White = class(1, 1, 1)
 class.Black = class(0, 0, 0)
 
 -- METHODS
+function class.fromHSV(H, S, V, A)
+    H = H * 360
+
+    local R,G,B = 0,0,0
+    local C = V * S
+    local X = C * (1 - math.abs((H/60)%2-1))
+    local m = V - C
+
+    if H < 60 then R = C; G = X; B = 0
+    elseif H < 120 then R = X; G = C; B = 0
+    elseif H < 180 then R = 0; G = C; B = X
+    elseif H < 240 then R = 0; G = X; B = C
+    elseif H < 300 then R = X; G = 0; B = C
+    else R = C; G = 0; B = X
+    end
+
+    return class(R,G,B,A)
+end
+
 function class:apply()
     love.graphics.setColor(self.R, self.G, self.B, self.A)
 end

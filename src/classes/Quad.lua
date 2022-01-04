@@ -11,6 +11,7 @@ function class:new(ImagePath, Size, TextureSize)
 
     self.Texture = love.graphics.newImage(ImagePath)
     self.Texture:setWrap("repeat", "repeat")
+    self.Texture:setFilter("nearest")
 
     self.TextureSize = TextureSize or self.Size
     self:updateQuad()

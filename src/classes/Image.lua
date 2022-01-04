@@ -9,6 +9,7 @@ function class:new(ImagePath)
     self.super.new(self)
 
     self.Texture = love.graphics.newImage(ImagePath)
+    self.Texture:setFilter("nearest")
 end
 
 function class:draw()
