@@ -37,6 +37,14 @@ function module.rem(obj)
     end
 end
 
+function module.changeScreen(newScreen)
+    module.rem(module.CurrentScreen)
+    module.CurrentScreen.cleanup()
+    module.CurrentScreen = newScreen
+    module.CurrentScreen.open()
+    module.add(module.CurrentScreen)
+end
+
 -- EVENTS
 function love.draw()
     for _,v in pairs(Objectpool) do

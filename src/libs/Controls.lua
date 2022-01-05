@@ -28,6 +28,12 @@ function module.bind(key, callback)
     return con
 end
 
+function module.unbind(key)
+    if not binds[key] then return end
+    print("Unbinded", key)
+    binds[key] = {}
+end
+
 -- EVENTS
 function love.keypressed(key, scancode, isRepeat)
     module.LastInput = key
