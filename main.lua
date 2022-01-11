@@ -8,7 +8,7 @@ local Screen = require("src/libs/Rendering/Screen")
 -- Settings
 Renderer.ScreenSize = Vector2(1280, 1024)
 Renderer.BackgroundColor = Color(.075, .075, .075)
-Renderer.CurrentScreen = Screen.get("Title")
+Renderer.CurrentScreen = Screen.get("SpritesheetTest")
 
 -- Functions
 function love.load()

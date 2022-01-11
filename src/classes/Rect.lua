@@ -34,15 +34,12 @@ function class:draw()
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
 
     self.Color:apply()
-    if self.Shader then love.graphics.setShader(self.Shader) end
-
+    
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)
     love.graphics.translate(-ScaleX, -ScaleY)
     love.graphics.rectangle("fill", 0, 0, self.Size.X, self.Size.Y, self.CornerRadius)
     love.graphics.origin()
-    
-    if self.Shader then love.graphics.setShader() end
 end
 
 return class

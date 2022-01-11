@@ -10,7 +10,6 @@ function class:new(ImagePath, Size, TextureSize)
     self.Size = Size or Vector2(0, 0)
 
     self.Texture = love.graphics.newImage(ImagePath)
-    self.Texture:setWrap("repeat", "repeat")
     self.Texture:setFilter("nearest")
 
     self.TextureSize = TextureSize or self.Size
@@ -35,14 +34,12 @@ function class:draw()
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
 
     self.Color:apply()
-    if self.Shader then love.graphics.setShader(self.Shader) end
 
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)
     love.graphics.translate(-ScaleX, -ScaleY)
     love.graphics.draw(self.Texture, self.Quad, 0, 0)
     love.graphics.origin()
-    if self.Shader then love.graphics.setShader() end
 end
 
 return class
