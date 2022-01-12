@@ -29,9 +29,9 @@ function module.new(Name)
         end
     end
 
-    function self.draw()
+    function self:draw(time)
         for _,v in pairs(self.Objectpool) do
-            v.obj:draw()
+            v.obj:draw(time)
         end
     end
 

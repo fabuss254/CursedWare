@@ -21,16 +21,20 @@ function class:new(ImagePath, SpriteSize, Duration)
     end
 
     -- // Spritesheet properties
+    self._Time = 0
+    self._SavedFrame = 0
+
     self.CurrentFrame = 1
     self.IsPlaying = false
     self.Duration = Duration or 1
+    self.TargetDuration = Duration or 1
     self.Speed = 1
 
     return self
 end
 
 function class:play()
-    self.StartTime = love.timer.getTime()
+    self._StartTime = love.timer.getTime()
     self.IsPlaying = true
 end
 
@@ -39,24 +43,40 @@ function class:stop()
 end
 
 function class:cancel()
-    self.IsPlaying = false
+    self:stop()
+    self._Time = 0
     self.CurrentFrame = 1
+    self._SavedFrame = 0
 end
 
-function class:draw()
+function class:SkipFrame(numOfFrames)
+    self._SavedFrame = self._SavedFrame + numOfFrames
+end
+
+function class:setDuration(newDuration)
+    self._Time = 0
+    self._SavedFrame = self.CurrentFrame
+    self.Duration = newDuration
+end
+
+function class:draw(time)
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
 
     self.Color:apply()
 
-    --if self.IsPlaying then
-    --    self.CurrentFrame = math.floor(animation.currentTime / animation.duration * #animation.quads) + 1
-    --end
+    if self.IsPlaying then
+        local dt = time - self._StartTime
+        self._StartTime = time
+
+        self._Time = self._Time + dt
+        self.CurrentFrame = math.max(self.CurrentFrame, self._SavedFrame + math.floor(self._Time / self.Duration * #self.Quads))
+    end
     
 
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)
     love.graphics.translate(-ScaleX, -ScaleY)
-    love.graphics.draw(self.Image, self.Quads[self.CurrentFrame], 0, 0, 0, self.Size.X/self.SpriteSize.X, self.Size.Y/self.SpriteSize.Y)
+    love.graphics.draw(self.Image, self.Quads[(self.CurrentFrame%#self.Quads) + 1], 0, 0, 0, self.Size.X/self.SpriteSize.X, self.Size.Y/self.SpriteSize.Y)
     love.graphics.origin()
 end
 

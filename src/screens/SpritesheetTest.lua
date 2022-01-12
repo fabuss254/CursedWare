@@ -5,25 +5,55 @@ local Spritesheet = require("src/classes/Spritesheet")
 
 local Screen = require("src/libs/Rendering/Screen")
 local Renderer = require("src/libs/Rendering/Renderer")
+local Controls = require("src/libs/Controls")
 
 -- Settings
-local Menu = Screen.new("TestIntermission")
+local Menu = Screen.new("SpritesheetTest")
 
 -- Objects
-local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 1)
+local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 2)
 Animation.Size = Renderer.ScreenSize
 Menu.add(Animation)
 
 -- // Runners
 function Menu.open()
-    openTime = love.timer.getTime()
+    Controls.bind("e", function(e)
+        if not e then return end
+        print("Stop")
+        Animation:stop()
+    end)
+
+    Controls.bind("r", function(e)
+        if not e then return end
+        print("Cancel")
+        Animation:cancel()
+    end)
+
+    Controls.bind("down", function(e)
+        if not e then return end
+        print("Duration")
+        Animation:setDuration(Animation.Duration - .05)
+        print(Animation.Duration)
+    end)
+
+    Controls.bind("up", function(e)
+        if not e then return end
+        print("Duration")
+        Animation:setDuration(Animation.Duration + .05)
+        print(Animation.Duration)
+    end)
+
+    Controls.bind("z", function(e)
+        if not e then return end
+        print("Play")
+        Animation:play()
+    end)
+
+    Animation:play()
 end
 
-local LastFrame = love.timer.getTime()
 function Menu.update(dt)
-    if love.timer.getTime() - LastFrame < 1/45 then return end
-    LastFrame = love.timer.getTime()
-    Animation.CurrentFrame = ((Animation.CurrentFrame + 1)%#Animation.Quads) + 1
+    
 end
 
 return Menu

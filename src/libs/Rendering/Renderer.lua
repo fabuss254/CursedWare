@@ -47,9 +47,10 @@ end
 
 -- EVENTS
 function love.draw()
-    
+    local time = love.timer.getTime()
+
     for _,v in pairs(Objectpool) do
-        v.obj:draw()
+        v.obj:draw(time)
     end
 
     love.graphics.setColor(1, 1, 1, .1)
