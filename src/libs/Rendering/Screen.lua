@@ -3,6 +3,7 @@ local screenPool = {}
 
 function module.new(Name)
     local self = {}
+    self.Name = "SCREEN"
     self.Objectpool = {}
     self.drawId = 0
 
@@ -29,6 +30,14 @@ function module.new(Name)
         end
     end
 
+    function self.update2(dt)
+        for _,v in pairs(self.Objectpool) do
+            if v.obj.update then
+                v.obj:update(dt)
+            end
+        end
+    end
+
     function self:draw(time)
         for _,v in pairs(self.Objectpool) do
             v.obj:draw(time)
@@ -37,7 +46,6 @@ function module.new(Name)
 
     -- // Modifiables
     function self.open() end
-    function self.update(dt) end
     function self.cleanup() end
 
     screenPool[Name] = self

@@ -25,6 +25,7 @@ function module.add(obj, zIndex)
     table.sort(Objectpool, function(a, b)
         return a.zIndex < b.zIndex
     end)
+
     return true
 end
 
@@ -46,6 +47,14 @@ function module.changeScreen(newScreen)
 end
 
 -- EVENTS
+function module.update(dt)
+    for _,v in pairs(Objectpool) do
+        if v.obj.update2 then
+            v.obj.update2(dt)
+        end
+    end
+end
+
 function love.draw()
     local time = love.timer.getTime()
 

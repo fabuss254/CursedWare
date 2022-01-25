@@ -19,6 +19,7 @@ function love.load()
 end
 
 function love.update(dt)
+    Renderer.update(dt)
     Renderer.CurrentScreen.update(dt)
 
     -- LOGS
