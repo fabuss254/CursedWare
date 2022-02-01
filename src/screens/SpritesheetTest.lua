@@ -8,7 +8,7 @@ local Renderer = require("src/libs/Rendering/Renderer")
 local Controls = require("src/libs/Controls")
 
 -- Settings
-local Menu = Screen.new("SpritesheetTest")
+local Menu = Screen.new()
 
 -- Objects
 local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 2)

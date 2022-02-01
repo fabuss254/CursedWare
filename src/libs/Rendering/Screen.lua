@@ -1,9 +1,9 @@
 local module = {}
 local screenPool = {}
 
-function module.new(Name)
+function module.new()
     local self = {}
-    self.Name = "SCREEN"
+    --self.Name = "SCREEN"
     self.Objectpool = {}
     self.drawId = 0
 
@@ -48,13 +48,13 @@ function module.new(Name)
     function self.open() end
     function self.cleanup() end
 
-    screenPool[Name] = self
+    --screenPool[Name] = self
     return self
 end
 
 function module.get(Name)
     if not screenPool[Name] then
-        require("src/screens/" .. Name)
+        screenPool[Name] = require("src/screens/" .. Name)
     end
 
     return screenPool[Name]

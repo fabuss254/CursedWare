@@ -13,7 +13,7 @@ local Controls = require("src/libs/Controls")
 local Instance = require("src/libs/Instance")
 
 -- Settings
-Menu = Screen.new("Credits")
+Menu = Screen.new()
 
 local ColorNonSelected = Color(255, 255, 255)
 local ColorSelected = Color(255, 255, 0)

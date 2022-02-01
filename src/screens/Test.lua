@@ -7,7 +7,7 @@ local Screen = require("src/libs/Rendering/Screen")
 local Renderer = require("src/libs/Rendering/Renderer")
 
 -- Settings
-local Menu = Screen.new("Test")
+local Menu = Screen.new()
 
 -- Variables
 local openTime = 0
