@@ -36,9 +36,9 @@ Menu.Musics = {
 local FadeInDuration = 5
 local FadeOutDuration = 2
 
-local TextActive = Color(255, 255, 255)
-local TextGood = Color(66, 255, 98)
-local TextBad = Color(255, 66, 66)
+local TextActive = Color(1, 1, 1)
+local TextGood = Color(66/255, 1, 98/255)
+local TextBad = Color(1, 66/255, 66/255)
 
 -- // Objects
 Menu.GAME = { -- MAIN GAME OBJECT
@@ -51,7 +51,7 @@ Menu.GAME = { -- MAIN GAME OBJECT
 
 -- // SETUP
 local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 2)
-Animation.Anchor = Vector2(.5, .5)
+Animation.Anchor = Vector2(.5, 1)
 Menu.add(Animation, -5)
 
 local Font = love.graphics.newFont("assets/Fonts/Platinum Sign Over.ttf", 50)
@@ -78,6 +78,7 @@ local TEST_Texts = {
 }
 
 local Game_Started = false
+local NextStep
 
 -- // Functions
 function getMinigames()
@@ -145,6 +146,15 @@ function popScreenOUT()
     end)
 end
 
+function skip_intro()
+    Menu.GAME.StageMusic.Source:seek(30, "seconds")
+    MainText:SetText("BONNE CHANCE !")
+
+    local Original = {R = Renderer.BackgroundColor.R, G=Renderer.BackgroundColor.G, B=Renderer.BackgroundColor.B}
+    Renderer.BackgroundColor = Color(.5, .5, .5)
+    TweenService.new(.3, Renderer.BackgroundColor, {R=Original.R, G=Original.G, B=Original.B}, 'linear'):play()
+end
+
 function Intro()
     local curBeat = Menu.GAME.StageMusic.Beat
 
@@ -168,9 +178,14 @@ function step()
 
     if not Game_Started then
         Game_Started = true
-        TweenService.new(1, Animation.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'outSine'):play()
-        TweenService.new(.5, Animation.Size, {X = Renderer.ScreenSize.X, Y = Renderer.ScreenSize.Y}, 'outSine'):play()
+        TweenService.new(1, Animation.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y}, 'inOutSine'):play()
+        DelayService.new(0.5, function()
+            TweenService.new(1, Animation.Size, {X = Renderer.ScreenSize.X, Y = Renderer.ScreenSize.Y}, 'inOutSine'):play()
+        end)
+        
     end
+
+    NextStep = NextStep or Menu.GAME.StageMusic.Beat + 7
 
     MainText:SetText("CHOOSING MINIGAME")
 end
@@ -182,6 +197,9 @@ local ScreenPopped = false
 local ScreenPOUT = false
 function Menu.open()
     startTick = 0
+    game_started = false
+    NextStep = nil
+
     Animation.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*1.5)
     Animation.Size = Renderer.ScreenSize*.8
 
@@ -191,9 +209,11 @@ function Menu.open()
     Menu.GAME.StageMusic.Source:setLooping(false)
     Menu.GAME.StageMusic.Source:setVolume(0)
     Menu.GAME.StageMusic.Source:play()
-    Menu.GAME.StageMusic.Source:seek(30, "seconds")
 
     FadeMusic(1, 1)
+    DelayService.new(3, function()
+        skip_intro()
+    end)
 
     Animation:play()
     Animation:setDuration((Menu.GAME.StageMusic.BPM/60)*0.55)

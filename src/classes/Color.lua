@@ -44,8 +44,7 @@ function class.fromHSV(H, S, V, A)
 end
 
 function class:apply(Trans, isText)
-    local mult = isText and 255 or 1
-    love.graphics.setColor(self.R/mult, self.G/mult, self.B/mult, self.A*(Trans or 1))
+    love.graphics.setColor(self.R, self.G, self.B, self.A*(Trans or 1))
 end
 
 function class:applyBackground()
