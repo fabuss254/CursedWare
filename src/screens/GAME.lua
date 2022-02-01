@@ -40,6 +40,13 @@ local TextActive = Color(1, 1, 1)
 local TextGood = Color(66/255, 1, 98/255)
 local TextBad = Color(1, 66/255, 66/255)
 
+local Keybinds = {
+    up = {"up", "o"},
+    down = {"down", "l"},
+    right = {"right", "m"},
+    left = {"left", "k"},
+}
+
 -- // Objects
 Menu.GAME = { -- MAIN GAME OBJECT
     Stage = 1,
@@ -78,11 +85,30 @@ local TEST_Texts = {
 }
 
 local Game_Started = false
-local NextStep
+local NextStep, Minigames
 
 -- // Functions
 function getMinigames()
-    
+    local Minigames = {}
+    for _,v in pairs(love.filesystem.getDirectoryItems("minigames/")) do
+        local mod = require("minigames/" .. v .. "/game")
+        if mod.IsActive then
+            mod.Directory = "minigames/" .. v
+            Minigames[v] = mod
+        end
+    end
+
+    return Minigames
+end
+
+function ChooseMinigame()
+    if not Minigames then Minigames = getMinigames() end
+
+    local o = {}
+    for i,_ in pairs(Minigames) do
+        table.insert(o, i)
+    end
+    return Minigames[o[math.random(1, #o)]]
 end
 
 function getCurrentMusic(Stage)
@@ -130,6 +156,16 @@ function popScreenIN()
         TweenService.new(1, GameScreen.Size, {X = Renderer.ScreenSize.X+80, Y = Renderer.ScreenSize.Y+64}, 'inOutSine'):play()
 
         FadeMusic(1, 0)
+        DelayService.new(1.1, function()
+            Menu.rem(Animation)
+            Menu.rem(GameScreen)
+
+            Menu.GAME.CurrentMinigame:_PreStart()
+            Menu.GAME.CurrentMinigame:Start()
+
+            Menu.GAME.CurrentMinigame._Started = true
+            
+        end)
     end)
 end
 
@@ -173,6 +209,53 @@ function Intro()
     end
 end
 
+function PreSetupMinigame(self, PlayerID)
+    self._Cache = {Binds = {}, Objs = {}}
+    self._Started = false
+    self.PlayerID = PlayerID
+
+    -- Boundaries
+    self.BoundPos = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y* ((Menu.NumberOfPlayers == 1 and .5) or (Menu.NumberOfPlayers == 2 and (PlayerID == 1 and .25 or .75))))
+    self.BoundSize = Vector2(Renderer.ScreenSize.X, Renderer.ScreenSize.Y*.5)
+
+    self.PlayMusic = function(MusicFolder)
+        self._MusicSource = love.audio.newSource(MusicFolder, "static")
+        self._MusicSource:setLooping(true)
+        self._MusicSource:setVolume(1)
+        self._MusicSource:play()
+    end
+
+    self.BindKey = function(Key, FN)
+        Key = Key:lower()
+        if not Keybinds[Key] then error("No keybind named '" .. Key .. "' found !") end
+
+        self._Cache.Binds[Keybinds[Key][PlayerID]] = FN
+    end
+
+    self.add = function(Obj, ZIndex)
+        table.insert(self._Cache.Objs, Obj)
+    end
+
+    self._PreStart = function()
+        for i,Obj in pairs(self._Cache.Objs) do
+            Menu.add(Obj, ZIndex)
+        end
+        for i,FN in pairs(self._Cache.Binds) do
+            print("BIND", i)
+            Controls.bind(i, FN)
+        end
+    end
+
+    self._PreCleanup = function()
+        for i,_ in pairs(self._Cache.Objs) do
+            Menu.rem(Obj)
+        end
+        for i,_ in pairs(self._Cache.Binds) do
+            Controls.unbind(i)
+        end
+    end
+end
+
 function step()
     if Menu.GAME.StageMusic.Beat < 31 and Menu.GAME.StageMusic.Stage == 1 then return Intro() end
 
@@ -185,9 +268,18 @@ function step()
         
     end
 
-    NextStep = NextStep or Menu.GAME.StageMusic.Beat + 7
+    if not NextStep then
+        Menu.GAME.CurrentMinigame = ChooseMinigame().new()
+        PreSetupMinigame(Menu.GAME.CurrentMinigame, 1)
+        Menu.GAME.CurrentMinigame:Setup()
+    end
 
-    MainText:SetText("CHOOSING MINIGAME")
+    MainText:SetText(Menu.GAME.CurrentMinigame:GetObjective():upper())
+    NextStep = NextStep or Menu.GAME.StageMusic.Beat + 7
+    if Menu.GAME.StageMusic.Beat == NextStep and not Menu.GAME.CurrentMinigame._ScreenOn then
+        Menu.GAME.CurrentMinigame._ScreenOn = true
+        popScreenIN()
+    end
 end
 
 -- // Runners
@@ -222,30 +314,16 @@ end
 function Menu.update(dt)
     curTime = curTime + dt
 
-    --MainText.Color = Color.fromHSV((love.timer.getTime()) %1, 255, 1)
-
-    --[[
-    if curTime > 2 and not ScreenPopped then
-        ScreenPopped = true
-        popScreenIN()
-    elseif curTime > 6 and not ScreenPOUT then
-        ScreenPOUT = true
-        popScreenOUT()
-    elseif curTime > 10 then
-        curTime = 0
-        ScreenPopped = false
-        ScreenPOUT = false
-
-        MainText:SetText(TEST_Texts[math.random(1, #TEST_Texts)])
-    end
-    ]]
-
     local dahBeat = math.floor(Menu.GAME.StageMusic.Source:tell("seconds")/(Menu.GAME.StageMusic.BPM/60/1.8))
     if dahBeat ~= Menu.GAME.StageMusic.Beat then
         Menu.GAME.StageMusic.Beat = dahBeat
         print("BEAT !", Menu.GAME.StageMusic.Beat, " | ", Menu.GAME.StageMusic.Source:tell("seconds"))
 
         step()
+    end
+
+    if Menu.GAME.CurrentMinigame and Menu.GAME.CurrentMinigame._Started then
+        Menu.GAME.CurrentMinigame:Update(dt)
     end
 end
 

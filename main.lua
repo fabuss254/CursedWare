@@ -15,6 +15,7 @@ Renderer.CurrentScreen = Screen.get("GAME")
 
 -- Functions
 function love.load()
+    math.randomseed(love.timer.getTime())
     love.window.setMode(Renderer.ScreenSize.X, Renderer.ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
 
     Renderer.CurrentScreen.open()

@@ -20,10 +20,10 @@ function class:getMagnitude()
 end
 
 function class:getUnit()
-    local Max = self.X + self.Y
+    local Length = self:getMagnitude()
 
-    local x = self.X/Max
-    local y = self.Y/Max
+    local x = self.X/Length
+    local y = self.Y/Length
 
     return class((x == x and x) or 0, (y == y and y) or 0)
 end
