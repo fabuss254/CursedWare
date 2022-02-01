@@ -71,7 +71,7 @@ end
 function class:draw(time)
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
 
-    self.Color:apply()
+    self.Color:apply(1-self.Opacity)
 
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)

@@ -12,6 +12,7 @@ function class:new(x, y, w, h, r)
     self.Position = Vector2(x, y)
     self.Size = Vector2(w, h)
     self.Anchor = Vector2(0, 0)
+    self.Opacity = 0
 
     self.Color = Color(1, 1, 1)
     self.Rotation = r or 0
@@ -33,7 +34,7 @@ end
 function class:draw()
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
 
-    self.Color:apply()
+    self.Color:apply(1-self.Opacity)
     
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)

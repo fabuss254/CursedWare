@@ -16,7 +16,7 @@ function class:draw()
     local PosX, PosY, ScaleX, ScaleY = self:getDrawingCoordinates()
     local TextureWidth, TextureHeight = self.Texture:getDimensions()
 
-    self.Color:apply()
+    self.Color:apply(1-self.Opacity)
 
     love.graphics.translate(PosX - ScaleX, PosY - ScaleY)
     love.graphics.rotate(self.Rotation)
