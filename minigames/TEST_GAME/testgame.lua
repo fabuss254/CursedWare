@@ -31,7 +31,7 @@ local PossibleColors = {
     ["le Rond Rouge"] = Color(1, 0, 0),
     ["le Triangle Jaune"] = Color(1, 1, 0),
     ["le Carre Vert"] = Color(0, 1, 0),
-    ["l'Hexagone Bleu"] = Color(0, 0, 1)
+    ["l'Etoile Bleu"] = Color(0, 0, 1)
 }
 local TileColor
 
