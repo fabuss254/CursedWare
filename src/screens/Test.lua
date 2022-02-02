@@ -27,7 +27,7 @@ end
 function Menu.update(dt)
     if love.timer.getTime() - openTime < 5 then return end
 
-    Renderer.changeScreen(Screen.get("Title"))
+    Renderer.changeScreen(Screen.get("GAME"))
 end
 
 return Menu

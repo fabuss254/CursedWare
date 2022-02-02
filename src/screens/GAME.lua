@@ -23,7 +23,7 @@ Menu = Screen.new()
 -- // Settings | DEFAULT SETTINGS
 Menu.GamesBeforeSpeedup = 5 -- How much game before we spice the game up !
 Menu.DifficultyIncrease = .1 -- Increase difficulty by this factor each game, Difficulty will be round to the lowest integer if it's a decimal.
-Menu.SpeedFactor = 1.1 -- How much do we increase the speed by each stages.
+Menu.SpeedFactor = .1 -- How much do we increase the speed by each stages.
 
 Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
 Menu.NumberOfPlayers = 1 -- Number of players
@@ -52,7 +52,7 @@ Menu.GAME = { -- MAIN GAME OBJECT
     Stage = 1,
     StageMusic = nil,
 
-    CurrentSpeed = 1,
+    CurrentSpeed = 1.5,
     CurrentDifficulty = 1,
 }
 
@@ -75,14 +75,15 @@ GameScreen.Size = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*.5)
 GameScreen.Anchor = Vector2(.5, .5)
 Menu.add(GameScreen, 10)
 
-local TEST_Texts = {
-    "SAMPLE TEXT",
-    "YOU GOT BIG BONES",
-    "SOUKA BLYAT",
-    "THIS IS A VERY \nVERY\nVERY\nVERY\nVERY\nUSELESS SENTENCE",
-    "AMERICA \nFUCK YEAH !",
-    "COPY THE MOVES OF THIS IDIOT!"
-}
+local BombImg = Image("assets/imgs/bomb.png")
+BombImg.Anchor = Vector2(0, 1)
+BombImg.Size = Vector2(125, 125)
+BombImg.Position = Vector2(-10, Renderer.ScreenSize.Y-10)
+
+local BombText = TextLabel(love.graphics.newFont("assets/Fonts/DagestaN.ttf", 40))
+BombText.Anchor = Vector2(.5, .5)
+BombText.Position = Vector2(68, Renderer.ScreenSize.Y-52)
+BombText:SetText("88.8")
 
 local Game_Started = false
 local NextStep, Minigames
@@ -146,39 +147,47 @@ end
 
 function popScreenIN()
     GameScreen.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*1.5)
-    TweenService.new(1, GameScreen.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'outSine'):play()
-    TweenService.new(1.5, MainText.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y}, 'outSine'):play()
-    TweenService.new(1.5, MainText.Anchor, {X = .5, Y = 1}, 'outSine'):play()
-    TweenService.new(1.5, MainText, {Scale = .8}, 'outSine'):play()
-    TweenService.new(1, MainText, {Opacity = .5}, 'linear'):play()
+    TweenService.new(1/Menu.GAME.CurrentSpeed, GameScreen.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'outSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y}, 'inOutSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText.Anchor, {X = .5, Y = 1}, 'outSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText, {Scale = .8}, 'outSine'):play()
+    TweenService.new(1/Menu.GAME.CurrentSpeed, MainText, {Opacity = .5}, 'linear'):play()
 
-    DelayService.new(0.7, function()
-        TweenService.new(1, GameScreen.Size, {X = Renderer.ScreenSize.X+80, Y = Renderer.ScreenSize.Y+64}, 'inOutSine'):play()
+    DelayService.new(0.7/Menu.GAME.CurrentSpeed, function()
+        TweenService.new(1/Menu.GAME.CurrentSpeed, GameScreen.Size, {X = Renderer.ScreenSize.X+80, Y = Renderer.ScreenSize.Y+64}, 'inOutSine'):play()
 
-        FadeMusic(1, 0)
-        DelayService.new(1.1, function()
+        FadeMusic(1/Menu.GAME.CurrentSpeed, 0)
+        DelayService.new(1.1/Menu.GAME.CurrentSpeed, function()
             Menu.rem(Animation)
             Menu.rem(GameScreen)
 
             Menu.GAME.CurrentMinigame:_PreStart()
             Menu.GAME.CurrentMinigame:Start()
 
-            Menu.GAME.CurrentMinigame._Started = true
-            
+            if Menu.GAME.OtherMinigame then
+                Menu.GAME.OtherMinigame:_PreStart()
+                Menu.GAME.OtherMinigame:Start()
+            end
+
+            Menu.GAME.CurrentMinigame.MaxTime = Menu.GAME.CurrentMinigame:GetTime()
+            Menu.GAME.CurrentMinigame._Started = love.timer.getTime()
+
+            Menu.add(BombImg, 99999999)
+            Menu.add(BombText, 100000000)
         end)
     end)
 end
 
 function popScreenOUT()
-    TweenService.new(1, GameScreen.Size, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'inOutSine'):play()
-    TweenService.new(1.5, MainText.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'outSine'):play()
-    TweenService.new(1.5, MainText.Anchor, {X = .5, Y = .5}, 'outSine'):play()
-    TweenService.new(1.5, MainText, {Scale = 1}, 'outSine'):play()
-    TweenService.new(1, MainText, {Opacity = 0}, 'linear'):play()
+    TweenService.new(1/Menu.GAME.CurrentSpeed, GameScreen.Size, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'inOutSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*.5}, 'inOutSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText.Anchor, {X = .5, Y = .5}, 'outSine'):play()
+    TweenService.new(1.5/Menu.GAME.CurrentSpeed, MainText, {Scale = 1}, 'outSine'):play()
+    TweenService.new(1/Menu.GAME.CurrentSpeed, MainText, {Opacity = 0}, 'linear'):play()
 
-    FadeMusic(1, 1)
-    DelayService.new(0.7, function()
-        TweenService.new(1, GameScreen.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*-1.5}, 'inOutSine'):play()
+    FadeMusic(1/Menu.GAME.CurrentSpeed, 1)
+    DelayService.new(0.7/Menu.GAME.CurrentSpeed, function()
+        TweenService.new(1/Menu.GAME.CurrentSpeed, GameScreen.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y*-1.5}, 'inOutSine'):play()
     end)
 end
 
@@ -213,16 +222,25 @@ function PreSetupMinigame(self, PlayerID)
     self._Cache = {Binds = {}, Objs = {}}
     self._Started = false
     self.PlayerID = PlayerID
+    self.GameSpeed = Menu.GAME.CurrentSpeed
 
     -- Boundaries
     self.BoundPos = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y* ((Menu.NumberOfPlayers == 1 and .5) or (Menu.NumberOfPlayers == 2 and (PlayerID == 1 and .25 or .75))))
     self.BoundSize = Vector2(Renderer.ScreenSize.X, Renderer.ScreenSize.Y*.5)
 
+    -- Custom functions
     self.PlayMusic = function(MusicFolder)
+        if PlayerID == 2 then return end
         self._MusicSource = love.audio.newSource(MusicFolder, "static")
         self._MusicSource:setLooping(true)
         self._MusicSource:setVolume(1)
         self._MusicSource:play()
+        return self._MusicSource
+    end
+
+    self.StopMusic = function(MusicFolder)
+        if not self._MusicSource then return end
+        self._MusicSource:stop()
     end
 
     self.BindKey = function(Key, FN)
@@ -230,25 +248,57 @@ function PreSetupMinigame(self, PlayerID)
         if not Keybinds[Key] then error("No keybind named '" .. Key .. "' found !") end
 
         self._Cache.Binds[Keybinds[Key][PlayerID]] = FN
+        if self._Started then Controls.bind(Keybinds[Key][PlayerID], FN) end
     end
 
-    self.add = function(Obj, ZIndex)
-        table.insert(self._Cache.Objs, Obj)
+    self.Success = function()
+        local s = love.audio.newSource("assets/sounds/good.ogg", "static")
+        s:setLooping(false)
+        s:setVolume(.5)
+        s:play()
+
+        local obj = Image("assets/imgs/GOOD.png")
+        obj.Position = self.BoundPos
+        obj.Size = Vector2(self.BoundSize.Y*.8, self.BoundSize.Y*.8)
+        obj.Anchor = Vector2(.5, .5)
+        self.add(obj, 10000, true)
+
+        print("WE GOT A SUCCESS ! " .. PlayerID)
     end
 
+    self.Fail = function()
+        local s = love.audio.newSource("assets/sounds/fail_" .. math.random(1, 3) .. ".ogg", "static")
+        s:setLooping(false)
+        s:setVolume(.5)
+        s:play()
+
+        local obj = Image("assets/imgs/WRONG.png")
+        obj.Position = self.BoundPos
+        obj.Size = Vector2(self.BoundSize.Y*.8, self.BoundSize.Y*.8)
+        obj.Anchor = Vector2(.5, .5)
+        self.add(obj, 10000, true)
+
+        print("WE GOT A FAIL ! " .. PlayerID)
+    end
+
+    self.add = function(Obj, ZIndex, Force)
+        table.insert(self._Cache.Objs, {Obj, ZIndex})
+        if self._Started or Force then Menu.add(Obj, ZIndex) end
+    end
+
+    -- Pre functions
     self._PreStart = function()
         for i,Obj in pairs(self._Cache.Objs) do
-            Menu.add(Obj, ZIndex)
+            Menu.add(Obj[1], Obj[2])
         end
         for i,FN in pairs(self._Cache.Binds) do
-            print("BIND", i)
             Controls.bind(i, FN)
         end
     end
 
     self._PreCleanup = function()
-        for i,_ in pairs(self._Cache.Objs) do
-            Menu.rem(Obj)
+        for i,Obj in pairs(self._Cache.Objs) do
+            Menu.rem(Obj[1])
         end
         for i,_ in pairs(self._Cache.Binds) do
             Controls.unbind(i)
@@ -272,6 +322,13 @@ function step()
         Menu.GAME.CurrentMinigame = ChooseMinigame().new()
         PreSetupMinigame(Menu.GAME.CurrentMinigame, 1)
         Menu.GAME.CurrentMinigame:Setup()
+
+        if Menu.NumberOfPlayers == 2 then
+            Menu.GAME.OtherMinigame = ChooseMinigame().new()
+            Menu.GAME.OtherMinigame:setObjective(Menu.GAME.CurrentMinigame:getObjective())
+            PreSetupMinigame(Menu.GAME.OtherMinigame, 2)
+            Menu.GAME.OtherMinigame:Setup()
+        end
     end
 
     MainText:SetText(Menu.GAME.CurrentMinigame:GetObjective():upper())
@@ -291,6 +348,10 @@ function Menu.open()
     startTick = 0
     game_started = false
     NextStep = nil
+
+    for i=1, Menu.NumberOfPlayers do
+        Menu.GAME["LifePlayer" .. i] = 3
+    end
 
     Animation.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*1.5)
     Animation.Size = Renderer.ScreenSize*.8
@@ -322,9 +383,52 @@ function Menu.update(dt)
         step()
     end
 
-    if Menu.GAME.CurrentMinigame and Menu.GAME.CurrentMinigame._Started then
-        Menu.GAME.CurrentMinigame:Update(dt)
-    end
+    if Menu.GAME.CurrentMinigame then
+        if Menu.GAME.CurrentMinigame._Started then
+            -- UPDATE CYCLE
+            Menu.GAME.CurrentMinigame:Update(dt)
+            if Menu.GAME.OtherMinigame then
+                Menu.GAME.OtherMinigame:Update(dt)
+            end
+            
+
+            -- TIME
+            local tick = love.timer.getTime()
+            local Elapsed = tick - Menu.GAME.CurrentMinigame._Started
+
+            BombText:SetText(math.max(math.floor((Menu.GAME.CurrentMinigame.MaxTime-Elapsed)*10)/10, 0))
+            if Elapsed >= Menu.GAME.CurrentMinigame.MaxTime then
+                Menu.GAME.CurrentMinigame._Started = false
+                Menu.GAME.CurrentMinigame:Stop()
+                if Menu.GAME.OtherMinigame then Menu.GAME.OtherMinigame:Stop() end
+
+                DelayService.new(2/Menu.GAME.CurrentSpeed, function()
+                    Menu.GAME.CurrentMinigame:_PreCleanup()
+                    Menu.GAME.CurrentMinigame:Cleanup()
+                    Menu.GAME.CurrentMinigame:StopMusic()
+                    if Menu.GAME.OtherMinigame then 
+                        Menu.GAME.OtherMinigame:_PreCleanup() 
+                        Menu.GAME.OtherMinigame:Cleanup() 
+                        Menu.GAME.OtherMinigame:StopMusic()
+                    end
+
+                    Menu.rem(BombImg)
+                    Menu.rem(BombText)
+
+                    Menu.add(Animation)
+                    Menu.add(GameScreen)
+                    Menu.GAME.CurrentSpeed = Menu.GAME.CurrentSpeed + Menu.SpeedFactor
+                    Menu.GAME.StageMusic.Source:setPitch(Menu.GAME.CurrentSpeed)
+                    DelayService.new(.5/Menu.GAME.CurrentSpeed, function()
+                        
+                        FadeMusic(1/Menu.GAME.CurrentSpeed, 1)
+                        popScreenOUT()
+                        NextStep = nil
+                    end)
+                end)
+            end
+        end
+    end    
 end
 
 function Menu.cleanup()
