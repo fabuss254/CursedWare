@@ -30,7 +30,7 @@ end
 
 function module.unbind(key)
     if not binds[key] then return end
-    print("Unbinded", key)
+    
     binds[key] = {}
 end
 
