@@ -84,7 +84,7 @@ function module:Update(dt)
 
     -- This is an example, If we have 1s left and he's the player1, we say he succeeded
     if self.PlayerID == 1 and self:GetTimeRemaining() < 1 then
-        --self:Success()
+        self:Success()
     end
 end
 
