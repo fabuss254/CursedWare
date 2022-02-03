@@ -92,8 +92,10 @@ end
 function module:Stop()
     local GAME = self.GAME
 
-    self:Success() -- We can tell if he failed or win (Fail would be: self:Fail())
+    --self:Success() -- We can tell if he failed or win (Fail would be: self:Fail())
     -- The fail/success functions doesn't NEED to be called in Stop. Calling it during the game's time will result in it instantly stopping (freeze until time up)
+
+    -- If no win condition is called, Engine assume it's a Fail by default
 end
 
 -- This is just to cleanup your game, incase you need to make sure stuff is really destroyed in case of memory leak

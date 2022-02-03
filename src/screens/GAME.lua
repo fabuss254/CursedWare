@@ -299,8 +299,10 @@ function PreSetupMinigame(self, PlayerID)
     end
 
     self.Success = function()
-        if self._Stopped then print("Failed", self.PlayerID) return end
-        print("Pass", self.PlayerID)
+        if self._Stopped or self._Noted then return end
+        self._Noted = true
+        
+
         local s = love.audio.newSource("assets/sounds/good.ogg", "static")
         s:setLooping(false)
         s:setVolume(.5)
@@ -316,7 +318,9 @@ function PreSetupMinigame(self, PlayerID)
     end
 
     self.Fail = function()
-        if self._Stopped then return end
+        if self._Stopped or self._Noted then return end
+        self._Noted = true
+        
         local s = love.audio.newSource("assets/sounds/fail_" .. math.random(1, 3) .. ".ogg", "static")
         s:setLooping(false)
         s:setVolume(.5)
@@ -365,6 +369,7 @@ function PreSetupMinigame(self, PlayerID)
 
         self._Stopping = true
         self:Stop()
+        self:Fail()
         self._Stopped = true
     end
 
