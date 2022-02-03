@@ -29,6 +29,9 @@ Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 Menu.NumberOfLives = 1 -- If you fall at 0, it's the end!
 Menu.NumberOfPlayers = 2 -- Number of players
 
+Menu.StartSpeed = 1 -- Default speed
+Menu.StartDifficulty = 1 -- Default difficulty
+
 Menu.Musics = {
     ["Stages/VHS-HeadBody.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 1, BaseVolume = 1, BPM = 114},
     ["Stages/goreshit-pixel-rapist.mp3"] = {Name = "Pixel Rapist", Author = "Goreshit", Stage = 2, BaseVolume = 1, BPM = 200},
@@ -466,8 +469,8 @@ function Menu.open()
         Stage = 1,
         StageMusic = nil,
 
-        CurrentSpeed = 2,
-        CurrentDifficulty = 1,
+        CurrentSpeed = Menu.StartSpeed,
+        CurrentDifficulty = Menu.StartDifficulty,
     }
 
     for i=1, Menu.NumberOfPlayers do
