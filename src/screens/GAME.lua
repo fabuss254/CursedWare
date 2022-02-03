@@ -262,6 +262,7 @@ function PreSetupMinigame(self, PlayerID)
     self._Started = false
     self.PlayerID = PlayerID
     self.GameSpeed = Menu.GAME.CurrentSpeed
+    self.GameDifficulty = math.floor(Menu.GAME.CurrentDifficulty)
 
     -- Boundaries
     self.BoundPos = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y* ((Menu.NumberOfPlayers == 1 and .5) or (Menu.NumberOfPlayers == 2 and (PlayerID == 1 and .25 or .75))))
@@ -554,6 +555,7 @@ function Menu.update(dt)
                     Menu.add(Animation)
                     Menu.add(GameScreen)
                     Menu.GAME.Rounds = Menu.GAME.Rounds + 1
+                    Menu.GAME.CurrentDifficulty = Menu.GAME.CurrentDifficulty + Menu.DifficultyIncrease
 
                     local PassStage = Menu.GAME.Stage ~= math.ceil(Menu.GAME.Rounds/Menu.GamesBeforeSpeedup)
                     if Menu.GAME["LifePlayer1"] <= 0 or (Menu.NumberOfPlayers == 2 and Menu.GAME["LifePlayer2"] <= 0) then
