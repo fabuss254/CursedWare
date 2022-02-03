@@ -39,8 +39,11 @@ function module.rem(obj)
 end
 
 function module.changeScreen(newScreen)
-    module.rem(module.CurrentScreen)
-    module.CurrentScreen.cleanup()
+    if module.CurrentScreen then
+        module.rem(module.CurrentScreen)
+        module.CurrentScreen.cleanup()
+    end
+    
     module.CurrentScreen = newScreen
     module.CurrentScreen.open()
     module.add(module.CurrentScreen)

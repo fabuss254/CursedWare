@@ -21,12 +21,13 @@ local DelayService = require("src/libs/Delay")
 Menu = Screen.new()
 
 -- // Settings | DEFAULT SETTINGS
-Menu.GamesBeforeSpeedup = 2 -- How much game before we spice the game up !
+Menu.GamesBeforeSpeedup = 5 -- How much game before we spice the game up !
 Menu.DifficultyIncrease = .1 -- Increase difficulty by this factor each game, Difficulty will be round to the lowest integer if it's a decimal.
-Menu.SpeedFactor = .1 -- How much do we increase the speed by each stages.
+Menu.SpeedFactor = .5 -- How much do we increase the speed by each stages.
+Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 
-Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
-Menu.NumberOfPlayers = 1 -- Number of players
+Menu.NumberOfLives = 1 -- If you fall at 0, it's the end!
+Menu.NumberOfPlayers = 2 -- Number of players
 
 Menu.Musics = {
     ["Stages/VHS-HeadBody.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 1, BaseVolume = 1, BPM = 114},
@@ -50,14 +51,7 @@ local Keybinds = {
 }
 
 -- // Objects
-Menu.GAME = { -- MAIN GAME OBJECT
-    Rounds = 1,
-    Stage = 1,
-    StageMusic = nil,
-
-    CurrentSpeed = 1,
-    CurrentDifficulty = 1,
-}
+Menu.GAME = {}
 
 -- // SETUP
 local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 2)
@@ -149,13 +143,21 @@ function getCurrentMusic(Stage)
     print("Checking music for stage", Stage)
 
     local AllowedMusics = {}
+    local CurMusicID = -1
+    local CurIndex = 1
     for i,v in pairs(Menu.Musics) do
         if not v.Link then
             v.Link = i
         end
 
         if v.Stage == Stage then
-            table.insert(AllowedMusics, v)
+            AllowedMusics[CurIndex] = v
+            
+            if Menu.GAME.StageMusic and v.Link == Menu.GAME.StageMusic.Link then
+                CurMusicID = CurIndex
+            end
+
+            CurIndex = CurIndex + 1
         end
     end
 
@@ -163,11 +165,11 @@ function getCurrentMusic(Stage)
         if Stage == Menu.GAME.Stage then print("\x1B[31m[WARNING] No music for stage " .. Stage .. " found! Using lower stage's music.\x1B[0m") end
 
         return getCurrentMusic(Stage-1) 
+    elseif CurMusicID > 0 and #AllowedMusics > 1 then
+        table.remove(AllowedMusics, CurMusicID)
     end
 
-    local o = AllowedMusics[math.random(1, #AllowedMusics)]
-    print("got", o.Link)
-    return o
+    return AllowedMusics[math.random(1, #AllowedMusics)]
 end
 
 function FadeMusic(Duration, End)
@@ -393,6 +395,61 @@ function step()
     end
 end
 
+function EndGame()
+    Menu.GAME.Stage = math.ceil(Menu.GAME.Rounds/Menu.GamesBeforeSpeedup)
+
+    local sfx = love.audio.newSource("/assets/sounds/RewindSFX.mp3", "static")
+    sfx:setLooping(false)
+    sfx:setVolume(1)
+    sfx:play()
+    Animation:stop()
+
+    Menu.GAME.StageMusic.Source:stop()
+    InTransition = true
+    popScreenOUT()
+    MainText:SetText("...")
+
+    local sfx
+    DelayService.new(3, function()
+        if Menu.NumberOfPlayers == 1 then
+            sfx = love.audio.newSource("/assets/sounds/dead.mp3", "static")
+            sfx:setLooping(false)
+            sfx:setVolume(1)
+            sfx:play()
+
+            MainText:SetText("FIN DE LA PARTIE!\n       SCORE " .. Menu.GAME.Rounds-1)
+        else
+            if Menu.GAME.LifePlayer1 > 0 or Menu.GAME.LifePlayer2 > 0 then
+                sfx = love.audio.newSource("/assets/sounds/Victory.mp3", "static")
+            else
+                sfx = love.audio.newSource("/assets/sounds/LOSE.ogg", "static")
+            end
+            sfx:setLooping(false)
+            sfx:setVolume(1)
+            sfx:play()
+            
+
+            DelayService.new(1.2, function()
+                if Menu.GAME.LifePlayer1 > 0 or Menu.GAME.LifePlayer2 > 0 then
+                    MainText:SetText("GAGNANT JOUEUR " .. (Menu.GAME.LifePlayer1 > 0 and "1" or "2") .. "!\n         SCORE " .. Menu.GAME.Rounds-1)
+                else
+                    MainText:SetText(" EX AEQUO!\n  SCORE " .. Menu.GAME.Rounds-1)
+                end
+            end)
+            MainText:SetText("...")
+        end
+    end)
+
+    DelayService.new(6, function()
+        Controls.bind("f", function(isDown)
+            if not isDown then return end
+            Controls.unbind("f")
+            sfx:stop()
+            Renderer.changeScreen(Screen.get("Title"))
+        end)
+    end)
+end
+
 -- // Runners
 
 local curTime = 0
@@ -400,18 +457,29 @@ local ScreenPopped = false
 local ScreenPOUT = false
 function Menu.open()
     startTick = 0
-    game_started = false
-    NextStep = nil
+    Game_Started = false
+    NextStep, InTransition = nil,nil
+
+    Menu.GAME = {
+        Rounds = 1,
+        Stage = 1,
+        StageMusic = nil,
+
+        CurrentSpeed = 2,
+        CurrentDifficulty = 1,
+    }
 
     for i=1, Menu.NumberOfPlayers do
-        Menu.GAME["LifePlayer" .. i] = 3
+        Menu.GAME["LifePlayer" .. i] = Menu.NumberOfLives
     end
 
     Menu.add(Heart1, 99999997)
     Menu.add(Heart1.Text, 99999998)
+    Heart1.Text:SetText(Menu.NumberOfLives)
     if Menu.NumberOfPlayers == 2 then
         Menu.add(Heart2, 99999997)
         Menu.add(Heart2.Text, 99999998)
+        Heart2.Text:SetText(Menu.NumberOfLives)
     end
 
     Animation.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*1.5)
@@ -422,7 +490,7 @@ function Menu.open()
     Menu.GAME.StageMusic.Source = love.audio.newSource("/assets/musics/" .. Menu.GAME.StageMusic.Link, "static")
     Menu.GAME.StageMusic.Source:setLooping(false)
     Menu.GAME.StageMusic.Source:setVolume(0)
-    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)/2)
+    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)*Menu.MusicSpeedMult)
     Menu.GAME.StageMusic.Source:play()
 
     FadeMusic(1, 1)
@@ -443,7 +511,7 @@ function Menu.update(dt)
     local dahBeat = math.floor(Menu.GAME.StageMusic.Source:tell("seconds")/(StepCrochet*2))
     if dahBeat ~= Menu.GAME.StageMusic.Beat then
         Menu.GAME.StageMusic.Beat = dahBeat
-        print("BEAT !", Menu.GAME.StageMusic.Beat, " | ", Menu.GAME.StageMusic.Source:tell("seconds"))
+        --print("BEAT !", Menu.GAME.StageMusic.Beat, " | ", Menu.GAME.StageMusic.Source:tell("seconds"))
 
         step()
     end
@@ -488,7 +556,9 @@ function Menu.update(dt)
                     Menu.GAME.Rounds = Menu.GAME.Rounds + 1
 
                     local PassStage = Menu.GAME.Stage ~= math.ceil(Menu.GAME.Rounds/Menu.GamesBeforeSpeedup)
-                    if PassStage then
+                    if Menu.GAME["LifePlayer1"] <= 0 or (Menu.NumberOfPlayers == 2 and Menu.GAME["LifePlayer2"] <= 0) then
+                        return EndGame()
+                    elseif PassStage then
                         Menu.GAME.Stage = math.ceil(Menu.GAME.Rounds/Menu.GamesBeforeSpeedup)
 
                         local sfx = love.audio.newSource("/assets/sounds/RewindSFX.mp3", "static")
@@ -502,7 +572,7 @@ function Menu.update(dt)
                     end
 
 
-                    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)/2)
+                    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)*Menu.MusicSpeedMult)
                     DelayService.new(.5/Menu.GAME.CurrentSpeed, function()
                         if PassStage then
                             MainText:SetText("...")
@@ -522,7 +592,7 @@ function Menu.update(dt)
                                     Menu.GAME.StageMusic.Source = love.audio.newSource("/assets/musics/" .. Menu.GAME.StageMusic.Link, "static")
                                     Menu.GAME.StageMusic.Source:setLooping(false)
                                     Menu.GAME.StageMusic.Source:setVolume(0)
-                                    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)/2)
+                                    Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)*Menu.MusicSpeedMult)
                                     Menu.GAME.StageMusic.Source:play()
                                     Animation:setDuration(((60 / Menu.GAME.StageMusic.BPM)*2) / Menu.GAME.CurrentSpeed)
                                     Animation:play()
@@ -547,7 +617,7 @@ function Menu.update(dt)
 end
 
 function Menu.cleanup()
-
+    Controls.unbind("f")
 end
 
 return Menu

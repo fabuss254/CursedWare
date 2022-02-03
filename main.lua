@@ -11,15 +11,14 @@ local DelayService = require("src/libs/Delay")
 -- Settings
 Renderer.ScreenSize = Vector2(1280, 1024)
 Renderer.BackgroundColor = Color(.075, .075, .075)
-Renderer.CurrentScreen = Screen.get("GAME")
+Renderer.CurrentScreen = nil
 
 -- Functions
 function love.load()
     math.randomseed(love.timer.getTime())
     love.window.setMode(Renderer.ScreenSize.X, Renderer.ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
 
-    Renderer.CurrentScreen.open()
-    Renderer.add(Renderer.CurrentScreen)
+    Renderer.changeScreen(Screen.get("GAME"))
 end
 
 function love.update(dt)
