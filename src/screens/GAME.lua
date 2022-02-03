@@ -27,7 +27,7 @@ Menu.SpeedFactor = .5 -- How much do we increase the speed by each stages.
 Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 
 Menu.NumberOfLives = 1 -- If you fall at 0, it's the end!
-Menu.NumberOfPlayers = 2 -- Number of players
+Menu.NumberOfPlayers = 1 -- Number of players
 
 Menu.StartSpeed = 1 -- Default speed
 Menu.StartDifficulty = 1 -- Default difficulty
