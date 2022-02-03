@@ -26,7 +26,7 @@ end
 
 -- // MINIGAME SETTINGS (STATIC PUBLIC)
 module.Name = "TEST_GAME" -- Name of the game
-module.IsActive = true -- Can this game be rolled?
+module.IsActive = false -- Can this game be rolled?
 
 -- // PRIVATE VARIABLES (STATIC)
 local PossibleColors = {"le Rond Rouge","le Triangle Jaune","le Carre Vert","l'Etoile Bleu"}
@@ -103,7 +103,6 @@ end
 
 -- This is ran first, before it's visible on screen. You can start playing music here.
 function module:Setup() 
-    print("GAME SPEED", self.GameSpeed)
     local GAME = self.GAME
 
     -- SIMPLE ATTRIBUTES

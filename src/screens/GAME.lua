@@ -143,7 +143,6 @@ end
 
 function getCurrentMusic(Stage)
     Stage = Stage or Menu.GAME.Stage
-    print("Checking music for stage", Stage)
 
     local AllowedMusics = {}
     local CurMusicID = -1
@@ -165,7 +164,7 @@ function getCurrentMusic(Stage)
     end
 
     if #AllowedMusics == 0 then
-        if Stage == Menu.GAME.Stage then print("\x1B[31m[WARNING] No music for stage " .. Stage .. " found! Using lower stage's music.\x1B[0m") end
+        --if Stage == Menu.GAME.Stage then print("\x1B[31m[WARNING] No music for stage " .. Stage .. " found! Using lower stage's music.\x1B[0m") end
 
         return getCurrentMusic(Stage-1) 
     elseif CurMusicID > 0 and #AllowedMusics > 1 then
@@ -281,6 +280,11 @@ function PreSetupMinigame(self, PlayerID)
         return self._MusicSource
     end
 
+    self.GetTimeRemaining = function()
+        if not Menu.GAME.CurrentMinigame._Started then return end
+        return Menu.GAME.CurrentMinigame.MaxTime - (love.timer.getTime() - Menu.GAME.CurrentMinigame._Started)
+    end
+
     self.StopMusic = function(MusicFolder)
         if not self._MusicSource then return end
         self._MusicSource:stop()
@@ -295,7 +299,8 @@ function PreSetupMinigame(self, PlayerID)
     end
 
     self.Success = function()
-        if self._Stopped then return end
+        if self._Stopped then print("Failed", self.PlayerID) return end
+        print("Pass", self.PlayerID)
         local s = love.audio.newSource("assets/sounds/good.ogg", "static")
         s:setLooping(false)
         s:setVolume(.5)
@@ -307,10 +312,7 @@ function PreSetupMinigame(self, PlayerID)
         obj.Anchor = Vector2(.5, .5)
         self.add(obj, 10000, true)
 
-        self._Stopped = true
-
-        self._Started = false
-        self:Stop()
+        self:_PreStop()
     end
 
     self.Fail = function()
@@ -326,8 +328,6 @@ function PreSetupMinigame(self, PlayerID)
         obj.Anchor = Vector2(.5, .5)
         self.add(obj, 10000, true)
 
-        self._Stopped = true
-
         -- Bruh... Why did I start 2 Players by hard coding it, worse decision in this project probably.
         Menu.GAME["LifePlayer" .. PlayerID] = Menu.GAME["LifePlayer" .. PlayerID] - 1
         if PlayerID == 1 then
@@ -336,8 +336,7 @@ function PreSetupMinigame(self, PlayerID)
             Heart2.Text:SetText(Menu.GAME["LifePlayer" .. PlayerID])
         end
 
-        self._Started = false
-        self:Stop()
+        self:_PreStop()
     end
 
     self.add = function(Obj, ZIndex, Force)
@@ -353,6 +352,20 @@ function PreSetupMinigame(self, PlayerID)
         for i,FN in pairs(self._Cache.Binds) do
             Controls.bind(i, FN)
         end
+    end
+
+    self._PreUpdate = function(self, dt)
+        if self._Stopped then return end
+
+        self:Update(dt)
+    end
+
+    self._PreStop = function()
+        if self._Stopped or self._Stopping then return end
+
+        self._Stopping = true
+        self:Stop()
+        self._Stopped = true
     end
 
     self._PreCleanup = function()
@@ -523,20 +536,21 @@ function Menu.update(dt)
     if Menu.GAME.CurrentMinigame then
         if Menu.GAME.CurrentMinigame._Started then
             -- UPDATE CYCLE
-            Menu.GAME.CurrentMinigame:Update(dt)
+            Menu.GAME.CurrentMinigame:_PreUpdate(dt)
             if Menu.GAME.OtherMinigame then
-                Menu.GAME.OtherMinigame:Update(dt)
+                Menu.GAME.OtherMinigame:_PreUpdate(dt)
             end
             
             -- TIME
             local tick = love.timer.getTime()
             local Elapsed = tick - Menu.GAME.CurrentMinigame._Started
-
+            
             BombText:SetText(math.max(math.floor((Menu.GAME.CurrentMinigame.MaxTime-Elapsed)*10)/10, 0))
+
             if Elapsed >= Menu.GAME.CurrentMinigame.MaxTime then
                 Menu.GAME.CurrentMinigame._Started = false
-                Menu.GAME.CurrentMinigame:Stop()
-                if Menu.GAME.OtherMinigame then Menu.GAME.OtherMinigame:Stop() end
+                Menu.GAME.CurrentMinigame:_PreStop()
+                if Menu.GAME.OtherMinigame then Menu.GAME.OtherMinigame:_PreStop() end
 
                 Menu.rem(BombImg)
                 Menu.rem(BombText)
@@ -554,12 +568,10 @@ function Menu.update(dt)
                     end
 
                     Menu.rem(BombExplosion)
-
                     Menu.add(Animation)
                     Menu.add(GameScreen)
                     Menu.GAME.Rounds = Menu.GAME.Rounds + 1
                     Menu.GAME.CurrentDifficulty = Menu.GAME.CurrentDifficulty + Menu.DifficultyIncrease
-
                     local PassStage = Menu.GAME.Stage ~= math.ceil(Menu.GAME.Rounds/Menu.GamesBeforeSpeedup)
                     if Menu.GAME["LifePlayer1"] <= 0 or (Menu.NumberOfPlayers == 2 and Menu.GAME["LifePlayer2"] <= 0) then
                         return EndGame()
@@ -575,7 +587,6 @@ function Menu.update(dt)
                         Menu.GAME.StageMusic.Source:stop()
                         InTransition = true
                     end
-
 
                     Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)*Menu.MusicSpeedMult)
                     DelayService.new(.5/Menu.GAME.CurrentSpeed, function()

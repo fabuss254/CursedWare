@@ -18,7 +18,8 @@ function love.load()
     math.randomseed(love.timer.getTime())
     love.window.setMode(Renderer.ScreenSize.X, Renderer.ScreenSize.Y, {resizable=false, vsync=false, borderless=true})
 
-    Renderer.changeScreen(Screen.get("Title"))
+    -- WARNING !!! There is a bug if you directly want to get on the GAME screen. If you do so, You won't be able to restart through menu.
+    Renderer.changeScreen(Screen.get("GAME")) -- Here you can input a screen's name in [src/screens/...], for example "Title", "Test" or "GAME"
 end
 
 function love.update(dt)
