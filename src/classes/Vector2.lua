@@ -28,6 +28,10 @@ function class:getUnit()
     return class((x == x and x) or 0, (y == y and y) or 0)
 end
 
+function class:Clone()
+    return class(self.X, self.Y)
+end
+
 -- METATABLES
 function class:__tostring()
     return string.format("Vector2(%i, %i)", self.X, self.Y)

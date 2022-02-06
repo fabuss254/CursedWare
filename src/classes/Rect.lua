@@ -10,7 +10,7 @@ function class:new(x, y, w, h, r)
     self._type = "Rect"
 
     self.Position = Vector2(x, y)
-    self.Size = Vector2(w, h)
+    self.Size = Vector2(w or 100, h or 100)
     self.Anchor = Vector2(0, 0)
     self.Opacity = 0
 

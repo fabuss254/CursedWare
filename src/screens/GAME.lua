@@ -22,11 +22,11 @@ Menu = Screen.new()
 
 -- // Settings | DEFAULT SETTINGS
 Menu.GamesBeforeSpeedup = 5 -- How much game before we spice the game up !
-Menu.DifficultyIncrease = .1 -- Increase difficulty by this factor each game, Difficulty will be round to the lowest integer if it's a decimal.
-Menu.SpeedFactor = .5 -- How much do we increase the speed by each stages.
+Menu.DifficultyIncrease = .2 -- Increase difficulty by this factor each game, Difficulty will be round to the lowest integer if it's a decimal.
+Menu.SpeedFactor = .25 -- How much do we increase the speed by each stages.
 Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 
-Menu.NumberOfLives = 1 -- If you fall at 0, it's the end!
+Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
 Menu.NumberOfPlayers = 1 -- Number of players
 
 Menu.StartSpeed = 1 -- Default speed
@@ -39,18 +39,15 @@ Menu.Musics = {
 }
 
 -- These settings below shouldn't be modified on runtime
-local FadeInDuration = 5
-local FadeOutDuration = 2
-
 local TextActive = Color(1, 1, 1)
 local TextGood = Color(66/255, 1, 98/255)
 local TextBad = Color(1, 66/255, 66/255)
 
 local Keybinds = {
-    up = {"up", "o"},
-    down = {"down", "l"},
-    right = {"right", "m"},
-    left = {"left", "k"},
+    up = {"up", "z"},
+    down = {"down", "s"},
+    right = {"right", "d"},
+    left = {"left", "q"},
 }
 
 -- // Objects
@@ -265,6 +262,7 @@ function PreSetupMinigame(self, PlayerID)
     self.PlayerID = PlayerID
     self.GameSpeed = Menu.GAME.CurrentSpeed
     self.GameDifficulty = math.floor(Menu.GAME.CurrentDifficulty)
+    print("SPEED", self.GameSpeed, "DIFFICULTY", self.GameDifficulty, "(" .. Menu.GAME.CurrentDifficulty .. ")")
 
     -- Boundaries
     self.BoundPos = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y* ((Menu.NumberOfPlayers == 1 and .5) or (Menu.NumberOfPlayers == 2 and (PlayerID == 1 and .25 or .75))))
