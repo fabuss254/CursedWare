@@ -48,6 +48,13 @@ local Keybinds = {
     down = {"down", "s"},
     right = {"right", "d"},
     left = {"left", "q"},
+
+    button1 = {"f", "q"},
+    button2 = {"r", "a"},
+    button3 = {"g", "s"},
+    button4 = {"t", "z"},
+    button5 = {"h", "d"},
+    button6 = {"y", "e"},
 }
 
 -- // Objects
