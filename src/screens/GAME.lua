@@ -27,7 +27,7 @@ Menu.SpeedFactor = .25 -- How much do we increase the speed by each stages.
 Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 
 Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
-Menu.NumberOfPlayers = 1 -- Number of players
+Menu.NumberOfPlayers = 2 -- Number of players
 
 Menu.StartSpeed = 1 -- Default speed
 Menu.StartDifficulty = 1 -- Default difficulty
@@ -44,10 +44,10 @@ local TextGood = Color(66/255, 1, 98/255)
 local TextBad = Color(1, 66/255, 66/255)
 
 local Keybinds = {
-    up = {"up", "z"},
-    down = {"down", "s"},
-    right = {"right", "d"},
-    left = {"left", "q"},
+    up = {"up", "o"},
+    down = {"down", "l"},
+    right = {"right", "m"},
+    left = {"left", "k"},
 
     button1 = {"f", "q"},
     button2 = {"r", "a"},
@@ -61,10 +61,6 @@ local Keybinds = {
 Menu.GAME = {}
 
 -- // SETUP
-local Animation = Spritesheet("assets/spritesheets/IntermissionSpeakers.png", Vector2(320, 256), 2)
-Animation.Anchor = Vector2(.5, 1)
-Menu.add(Animation, -5)
-
 local Font = love.graphics.newFont("assets/Fonts/Platinum Sign Over.ttf", 50)
 local MainText = ShakingText(Font)
 MainText.Position = Renderer.ScreenSize/2
@@ -201,7 +197,6 @@ function popScreenIN()
 
         FadeMusic(1/Menu.GAME.CurrentSpeed, 0)
         DelayService.new(1.1/Menu.GAME.CurrentSpeed, function()
-            Menu.rem(Animation)
             Menu.rem(GameScreen)
 
             Menu.GAME.CurrentMinigame:_PreStart()
@@ -394,20 +389,17 @@ function step()
 
     if not Game_Started then
         Game_Started = true
-        TweenService.new(1, Animation.Position, {X = Renderer.ScreenSize.X*.5, Y = Renderer.ScreenSize.Y}, 'inOutSine'):play()
-        DelayService.new(0.5, function()
-            TweenService.new(1, Animation.Size, {X = Renderer.ScreenSize.X, Y = Renderer.ScreenSize.Y}, 'inOutSine'):play()
-        end)
         
     end
 
     if not NextStep then
-        Menu.GAME.CurrentMinigame = ChooseMinigame().new()
+        local dahGame = ChooseMinigame()
+        Menu.GAME.CurrentMinigame = dahGame.new()
         PreSetupMinigame(Menu.GAME.CurrentMinigame, 1)
         Menu.GAME.CurrentMinigame:Setup()
 
         if Menu.NumberOfPlayers == 2 then
-            Menu.GAME.OtherMinigame = ChooseMinigame().new()
+            Menu.GAME.OtherMinigame = dahGame.new()
             Menu.GAME.OtherMinigame:setObjective(Menu.GAME.CurrentMinigame:getObjective())
             PreSetupMinigame(Menu.GAME.OtherMinigame, 2)
             Menu.GAME.OtherMinigame:Setup()
@@ -429,7 +421,6 @@ function EndGame()
     sfx:setLooping(false)
     sfx:setVolume(1)
     sfx:play()
-    Animation:stop()
 
     Menu.GAME.StageMusic.Source:stop()
     InTransition = true
@@ -509,9 +500,6 @@ function Menu.open()
         Heart2.Text:SetText(Menu.NumberOfLives)
     end
 
-    Animation.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*1.5)
-    Animation.Size = Renderer.ScreenSize*.8
-
     Menu.GAME.StageMusic = getCurrentMusic(Stage)
     Menu.GAME.StageMusic.Beat = -1
     Menu.GAME.StageMusic.Source = love.audio.newSource("/assets/musics/" .. Menu.GAME.StageMusic.Link, "static")
@@ -526,9 +514,6 @@ function Menu.open()
         Controls.unbind("f")
         skip_intro()
     end)
-
-    Animation:play()
-    Animation:setDuration(((60 / Menu.GAME.StageMusic.BPM)*2) / Menu.GAME.CurrentSpeed)
 end
 
 function Menu.update(dt)
@@ -578,7 +563,6 @@ function Menu.update(dt)
                     end
 
                     Menu.rem(BombExplosion)
-                    Menu.add(Animation)
                     Menu.add(GameScreen)
                     Menu.GAME.Rounds = Menu.GAME.Rounds + 1
                     Menu.GAME.CurrentDifficulty = Menu.GAME.CurrentDifficulty + Menu.DifficultyIncrease
@@ -592,7 +576,6 @@ function Menu.update(dt)
                         sfx:setLooping(false)
                         sfx:setVolume(1)
                         sfx:play()
-                        Animation:stop()
 
                         Menu.GAME.StageMusic.Source:stop()
                         InTransition = true
@@ -620,8 +603,6 @@ function Menu.update(dt)
                                     Menu.GAME.StageMusic.Source:setVolume(0)
                                     Menu.GAME.StageMusic.Source:setPitch(1 + (Menu.GAME.CurrentSpeed-1)*Menu.MusicSpeedMult)
                                     Menu.GAME.StageMusic.Source:play()
-                                    Animation:setDuration(((60 / Menu.GAME.StageMusic.BPM)*2) / Menu.GAME.CurrentSpeed)
-                                    Animation:play()
                                     FadeMusic(2, 1)
 
                                     DelayService.new(2, function()

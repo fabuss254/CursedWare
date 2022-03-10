@@ -191,7 +191,6 @@ function module:AddFlag(Pos, Size)
 end
 
 function module:GetStageTemplate()
-    if self.StageNum then return Stages[self.StageNum] end
     local Dif = math.min(self.GameDifficulty, MaxDifficulty)
 
     local AvailableStages = {}
@@ -201,6 +200,8 @@ function module:GetStageTemplate()
         end
     end
 
+    if self.StageNum then return (AvailableStages or Stages)[self.StageNum] end
+
     if not AvailableStages then
         print("NO STAGE AVAILABLE FOR DIFFICULTY " .. Dif)
         self.StageNum = 1
@@ -208,7 +209,7 @@ function module:GetStageTemplate()
     end
 
     self.StageNum = math.random(1, #AvailableStages)
-    return AvailableStages[math.random(1, #AvailableStages)]
+    return AvailableStages[self.StageNum]
 end
 
 function module:CreateStage()

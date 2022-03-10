@@ -367,6 +367,7 @@ end
 function tween.StaticUpdate(dt)
     for i,t in pairs(Pool) do
         if not t.isPlaying or t.clock == t.duration then
+            t:update(999)
             Pool[i] = nil
         else
             t:update(dt)
