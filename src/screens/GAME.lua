@@ -27,15 +27,20 @@ Menu.SpeedFactor = .25 -- How much do we increase the speed by each stages.
 Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 
 Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
-Menu.NumberOfPlayers = 2 -- Number of players
+Menu.NumberOfPlayers = 1 -- Number of players
 
 Menu.StartSpeed = 1 -- Default speed
 Menu.StartDifficulty = 1 -- Default difficulty
 
 Menu.Musics = {
     ["Stages/VHS-HeadBody.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 1, BaseVolume = 1, BPM = 114},
-    ["Stages/goreshit-pixel-rapist.mp3"] = {Name = "Pixel Rapist", Author = "Goreshit", Stage = 2, BaseVolume = 1, BPM = 200},
-    ["Stages/Genocide.ogg"] = {Name = "Genocide", Author = "Unknown", Stage = 2, BaseVolume = 1, BPM = 213}
+    ["Stages/Jet Set Radio Soundtrack - Sneakman.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 2, BaseVolume = 1, BPM = 114},
+    ["Stages/aNewDay.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 2, BaseVolume = 1, BPM = 114},
+    --["Stages/Discover.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 4, BaseVolume = 1, BPM = 114},
+    --["Stages/Discover.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 4, BaseVolume = 1, BPM = 114},
+    ["Stages/goreshit-pixel-rapist.mp3"] = {Name = "Pixel Rapist", Author = "Goreshit", Stage = 6, BaseVolume = 1, BPM = 200},
+    ["Stages/Genocide.ogg"] = {Name = "Genocide", Author = "Unknown", Stage = 6, BaseVolume = 1, BPM = 213},
+    ["Stages/a.mp3"] = {Name = "Genocide", Author = "Unknown", Stage = 6, BaseVolume = 1, BPM = 213}
 }
 
 -- These settings below shouldn't be modified on runtime
@@ -115,7 +120,7 @@ Heart2Text:SetText(3)
 Heart2.Text = Heart2Text
 
 local Game_Started = false
-local NextStep, Minigames, InTransition
+local NextStep, Minigames, InTransition, LastGame
 
 -- // Functions
 function getMinigames()
@@ -138,7 +143,14 @@ function ChooseMinigame()
     for i,_ in pairs(Minigames) do
         table.insert(o, i)
     end
-    return Minigames[o[math.random(1, #o)]]
+
+    local newGame = o[math.random(1, #o)]
+    while lastGame and newGame == lastGame do
+        newGame = o[math.random(1, #o)]
+    end
+
+    local LastGame = newGame
+    return Minigames[newGame]
 end
 
 function getCurrentMusic(Stage)
