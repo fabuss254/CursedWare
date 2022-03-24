@@ -35,7 +35,8 @@ local Definition = {
         Items = {
             {"Tutoriel", "Vitesse lente. (+10% par niveau, Multiplicateur de score: -0.5)", function(v) v.ScoreMultiplier = v.ScoreMultiplier - .5 v.SpeedFactor = 0.1 v.DifficultyIncrease = 0.1 end},
             {"Normale", "Vitesse normale. (+25% par niveau, Multiplicateur de score: +0)", function(v) end},
-            {"Express", "Vitesse accrue. (+50% par niveau, Multiplicateur de score: +0.3)", function(v) v.ScoreMultiplier = v.ScoreMultiplier + .3 v.SpeedFactor = 0.5 v.DifficultyIncrease = 0.4 end}
+            {"Express", "Vitesse accrue. (+50% par niveau, Multiplicateur de score: +0.3)", function(v) v.ScoreMultiplier = v.ScoreMultiplier + .3 v.SpeedFactor = 0.5 v.DifficultyIncrease = 0.4 end},
+            {"Extreme", "Vitesse extreme. (+100% par niveau, Multiplicateur de score: +0.4)", function(v) v.ScoreMultiplier = v.ScoreMultiplier + .4 v.SpeedFactor = 1 v.DifficultyIncrease = 0.8 end}
         }
     },
     {
@@ -126,7 +127,7 @@ for i,v in pairs(Definition) do
 end
 
 -- // Functions
-function resetGAME(v)
+local function resetGAME(v)
     v.GamesBeforeSpeedup = 5 -- How much game before we spice the game up !
     v.DifficultyIncrease = .2 -- Increase difficulty by this factor each game, Difficulty will be round to the lowest integer if it's a decimal.
     v.SpeedFactor = .25 -- How much do we increase the speed by each stages.
@@ -141,7 +142,18 @@ function resetGAME(v)
     v.StartDifficulty = 1 -- Default difficulty
 end
 
-function changeColumn(num)
+local function updateArrowsALLO()
+    local posX = Elements[curColumn].title.Position.X
+
+    arrows.upPosition = Vector2(posX, Renderer.ScreenSize.Y*(.5 + (-#Elements[curColumn].items)/20))
+    arrows.downPosition = Vector2(posX, Renderer.ScreenSize.Y*(.5 + (#Elements[curColumn].items-1)/20))
+end
+
+local function updateDescription()
+    DescriptionText:SetText("Description: " .. Definition[curColumn].Items[curItem][2])
+end
+
+local function changeColumn(num)
     if curColumn ~= 0 and curColumn <= Count then
         local e = Elements[curColumn]
         local finalColor = Definition[curColumn].Color:lerp(Color.Black, 0.2)
@@ -170,24 +182,13 @@ function changeColumn(num)
 
     curItem = Selections[num]
     curColumn = num
-    updateArrows()
+    updateArrowsALLO()
     updateDescription()
 
     return true
 end
 
-function updateDescription()
-    DescriptionText:SetText("Description: " .. Definition[curColumn].Items[curItem][2])
-end
-
-function updateArrows()
-    local posX = Elements[curColumn].title.Position.X
-
-    arrows.upPosition = Vector2(posX, Renderer.ScreenSize.Y*(.5 + (-#Elements[curColumn].items)/20))
-    arrows.downPosition = Vector2(posX, Renderer.ScreenSize.Y*(.5 + (#Elements[curColumn].items-1)/20))
-end
-
-function selectItem(ItemId)
+local function selectItem(ItemId)
     if curColumn > Count then return end
     local e = Elements[curColumn]
     ItemId = math.min(math.max(ItemId, 1), #e.items)
@@ -210,7 +211,7 @@ function selectItem(ItemId)
     updateDescription()
 end
 
-function validateItem()
+local function validateItem()
     Selections[curColumn] = curItem
     if changeColumn(curColumn+1) then
         local o = love.audio.newSource("assets/sounds/UI/select_003.ogg", "static")
@@ -223,7 +224,7 @@ function validateItem()
     end
 end
 
-function back()
+local function back()
     if curColumn == 1 then return end
     local o = love.audio.newSource("assets/sounds/UI/drop_003.ogg", "static")
     o:setVolume(1)
@@ -253,6 +254,16 @@ function Menu.open()
         validateItem()
     end)
 
+    Controls.bind(Input.player1.right, function(isDown)
+        if not isDown then return end
+        validateItem()
+    end)
+
+    Controls.bind(Input.player1.left, function(isDown)
+        if not isDown then return end
+        back()
+    end)
+
     Controls.bind(Input.player1.button3, function(isDown)
         if not isDown then return end
         back()
@@ -275,6 +286,8 @@ function Menu.cleanup()
     --MusicSource:stop()
     Controls.unbind(Input.player1.up)
     Controls.unbind(Input.player1.down)
+    Controls.unbind(Input.player1.left)
+    Controls.unbind(Input.player1.right)
     Controls.unbind(Input.player1.button1)
     Controls.unbind(Input.player1.button3)
 end

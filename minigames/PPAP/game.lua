@@ -26,6 +26,7 @@ end
 -- // MINIGAME SETTINGS (STATIC PUBLIC)
 module.Name = "PPAP" -- Name of the game
 module.IsActive = true -- Can this game be rolled?
+module.MultiplayerDisabled = true -- game doesn't support multiplayer
 
 -- // PRIVATE VARIABLES (STATIC)
 
@@ -41,6 +42,8 @@ local current_fruit=1
 local TabObjet={}
 local has_lost=false
 
+local errorMarging = 100
+
 -- // PRIVATE METHODS
 
 
@@ -48,12 +51,12 @@ local has_lost=false
 
 -- Should return the string that tell what to do (RUN AFTER SETUP !)
 function module:GetObjective()
-    return "Aligne les elements\nEnvoie le stick a gauche"
+    return "    Aligne les elements\nEnvoie le stick a gauche"
 end
 
 -- Should return the time the player is given to finish this minigame
 function module:GetTime()
-    return 20/self.GameSpeed -- Divide by game speed to shrink the time remaining to complete the game at high speed
+    return 10/self.GameSpeed -- Divide by game speed to shrink the time remaining to complete the game at high speed
 end
 
 -- 2 player compatibility, You can retrieve the objective from the other minigame and put it into this one
@@ -91,79 +94,59 @@ function module:Setup()
     self.background = Square()
     self.background.Anchor = Vector2(0, 0)
     self.background.Size = Vector2(1280,1024)
-    self.add(self.background,0)
+    self.add(self.background,-5)
     -- ANANAS
     self.Ananas = Image(self.Directory .. "/assets/Ananas.png")
     self.Ananas.Anchor=Vector2(.5,.5)
-    self.Ananas.Position=Vector2(1000,300)
+    self.Ananas.Position=Vector2(1000,math.random(200, 800))
     self.Ananas.Size=Vector2(360,180)
     TabObjet[4]=self.Ananas
     -- APPLE --
     self.Apple = Image(self.Directory .. "/assets/Apple.png")
     self.Apple.Anchor = Vector2(.5, .5)
-    self.Apple.Position = Vector2(1000,300)
+    self.Apple.Position = Vector2(1000,math.random(200, 800))
     self.Apple.Size = Vector2(240, 200)
     TabObjet[2]=self.Apple
     -- PEN1 --
     self.Pen1 = Image(self.Directory .. "/assets/Pen.png")
     self.Pen1.Anchor=Vector2(.5,.5)
-    self.Pen1.Position = Vector2(1000,300)
+    self.Pen1.Position = Vector2(1000,math.random(200, 800))
     self.Pen1.Size= Vector2(580,40)
     TabObjet[1]=self.Pen1
+    self.add(self.Pen1, 0)
     -- PEN2 --    
     self.Pen2 = Image(self.Directory .. "/assets/Pen.png")
     self.Pen2.Anchor=Vector2(.5,.5)
-    self.Pen2.Position = Vector2(1000,300)
+    self.Pen2.Position = Vector2(1000,math.random(200, 800))
     self.Pen2.Size= Vector2(580,40)
     TabObjet[3]=self.Pen2
 
     -- BUTTON BIND
-    self.BindKey("Left", function() -- mouvement joystick sur la gauche
-        if not has_lost then
-            if is_pressed==false then
-                while TabObjet[current_fruit].Position.X>200*current_fruit do
-                    TabObjet[current_fruit].Position.X=TabObjet[current_fruit].Position.X-100 -- Modification position item
-                end
-                if current_fruit==4 then
-                    if is_testable_3 then
-                        if TabObjet[4].Position.Y>=TabObjet[3].Position.Y+100 or TabObjet[4].Position.Y<=TabObjet[3].Position.Y-100  then
-                            self:Fail()
-                            has_lost=true
-                        else
-                            Win()
-                        end
-                    end
-                end
-                is_pressed=true
-            end
-            is_pressed=false
-            if is_testable_1 then -- allow to test object position if the object has started moving
-                if TabObjet[1].Position.Y>=TabObjet[2].Position.Y+100 or TabObjet[1].Position.Y<=TabObjet[2].Position.Y-100  then
-                    self:Fail()
-                    has_lost=true
-                end   
-            end
-            if is_testable_2 then
-                if TabObjet[2].Position.Y>=TabObjet[3].Position.Y+100 or TabObjet[2].Position.Y<=TabObjet[3].Position.Y-100  then
-                    self:Fail()
-                    has_lost=true
-                end   
-            end
+    for i=1, 2 do
+        self.BindKey(i == 1 and "Left" or "Button1", function(began) -- mouvement joystick sur la gauche
+            if not began then return end
+            if not has_lost and current_fruit <= 4 then
+                local EndPos = 200*current_fruit
+                local dFruit = current_fruit
 
-            --value changed after the object has moved
-            if current_fruit==1 then
-                is_testable_1=true
+                local hasFailedShot = dFruit ~= 1 and (TabObjet[dFruit].Position.Y>=TabObjet[dFruit-1].Position.Y+errorMarging or TabObjet[dFruit].Position.Y<=TabObjet[dFruit-1].Position.Y-errorMarging)
+                TweenService.new(0.4/self.GameSpeed, TabObjet[current_fruit].Position, {X = EndPos}, "outBack"):play()
+                DelayService.new(0.4/self.GameSpeed, function()
+                    if hasFailedShot then
+                        self:Fail()
+                        has_lost=true
+                    elseif dFruit == 4 then
+                        Win()
+                    end
+                end)
+                
+                current_fruit = current_fruit + 1 -- increment the value of the fruit to display
+                if TabObjet[current_fruit] then
+                    self.add(TabObjet[current_fruit],current_fruit)
+                end
             end
-            if current_fruit==2 then
-                is_testable_2=true
-            end
-            if current_fruit==3 then
-                is_testable_3=true
-            end
-            current_fruit = current_fruit + 1 -- increment the value of the fruit to display
-        end
-    end)
-    
+        end)
+    end
 end
 
 -- This is ran once the player has control over the minigame, All your binds should work at this point
@@ -182,8 +165,8 @@ end
 -- This is where you update stuff. That's it...
 function module:Update(dt)
     local GAME = self.GAME
-    self.add(TabObjet[current_fruit],0)
     dt = dt * self.GameSpeed -- Quick way to speed up the game if you're managing character velocity for example
+    if current_fruit > 4 then return end
 
     if TabObjet[current_fruit].Position.Y>=900 then
         inverseur_vecteur=-1
@@ -191,12 +174,14 @@ function module:Update(dt)
     if TabObjet[current_fruit].Position.Y<=100 then
         inverseur_vecteur=1
     end
-    TabObjet[current_fruit].Position = TabObjet[current_fruit].Position + Vector2(0, inverseur_vecteur*vitesse_deplacement) -- Modification position item
+    TabObjet[current_fruit].Position = TabObjet[current_fruit].Position + Vector2(0, inverseur_vecteur*vitesse_deplacement * dt * 500) -- Modification position item
 
+    --[[
     if self.PlayerID == 1 and self:GetTimeRemaining() < 1 then
         self:Fail()
         has_lost=true
     end
+    ]]
 end
 
 -- This is the last frame, update will stop running, but you can show random shit here
@@ -214,12 +199,6 @@ function module:Cleanup()
     local GAME = self.GAME
 
 
-end
-
-function OnInput()
-  local Tick = love.timer.getTime()
-  if Tick - LastInput < InputCooldown then return end -- Si temp de mtn - temp de l'input est en dessous de InputCooldown, Alors on annule l'action
-  LastInput = Tick
 end
 
 function Win()

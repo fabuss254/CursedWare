@@ -3,7 +3,7 @@ return {
         ["up"] = "up",
         ["down"] = "down",
         ["right"] = "right",
-        ["keft"] = "left",
+        ["left"] = "left",
         button1 = "f",
         button2 = "r",
         button3 = "g",

@@ -111,12 +111,10 @@ function module:update_verre()
         tour = tour + 1
         random_pos = math.random(1, 4)
         while (place_verre[random_pos] == 0) == false do
-            print(1)
             random_pos = math.random(1, 4)
         end
         choix_type = math.random(1, 4)
         while (verre_passe[choix_type] == true) do
-            print(2)
             choix_type = math.random(1, 4)
         end
         verre_passe[choix_type] = true
@@ -167,7 +165,6 @@ function module:update_position(dt)
             local random_new_pos = math.random(1, 4)
             place_verre[posBouteille] = 0
             while place_verre[random_new_pos] ~= 0 do
-                print(4)
                 random_new_pos = (random_new_pos + 1)%4
             end
             if random_new_pos ~= posBouteille then
@@ -197,7 +194,6 @@ function module:update_position(dt)
             local random_new_pos = math.random(1, 4)
             place_verre[posBouteille] = 0
             while place_verre[random_new_pos] ~= 0 do
-                print(5)
                 random_new_pos = (random_new_pos + 1)%4
             end
             if random_new_pos ~= posBouteille then

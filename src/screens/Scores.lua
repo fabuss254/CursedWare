@@ -31,12 +31,6 @@ end
 
 -- Scene constructor
 local Font = love.graphics.newFont("assets/Fonts/Comic.ttf", 60)
-local Data = love.filesystem.read("highscore")
-local DataTbl = split(Data, "\n")
-
-for i,v in pairs(DataTbl) do
-    DataTbl[i] = {string.sub(v, 1, 3), tonumber(string.sub(v, 5))}
-end
 
 local DescriptionText = TextLabel(love.graphics.newFont("assets/Fonts/Comic.ttf", 80))
 DescriptionText.Anchor = Vector2(0.5, 0)
@@ -51,13 +45,15 @@ t.Position = Vector2(Renderer.ScreenSize.X / 2, 0)
 t.Size = Vector2(40, Renderer.ScreenSize.Y*1)
 Menu.add(t, 2)
 
+local Objs = {}
 for i=1, 20 do
     local Y = i < 11 and (.2 + (i*0.07)) or (.2 + ((i-10)*0.07))
     local X = i < 11 and 0 or Renderer.ScreenSize.X*0.52
     local C = Color.fromRGB(255, 251, 140):lerp(Color.White, i/5):lerp(Color.Black, (i-5)/30)
 
-    local Username = DataTbl[i] and DataTbl[i][1] or "???"
-    local Score = DataTbl[i] and DataTbl[i][2] .. " pts" or ("0 pts")
+    Objs[i] = {}
+    --local Username = DataTbl[i] and DataTbl[i][1] or "???"
+    --local Score = DataTbl[i] and DataTbl[i][2] .. " pts" or ("0 pts")
 
     if i%2 == 1 and i < 11 then
         local t = Square()
@@ -81,7 +77,8 @@ for i=1, 20 do
     t.Position = Vector2(X + Renderer.ScreenSize.X*.2, Renderer.ScreenSize.Y*Y)
     t.Scale = 0.8
     t.Color = C
-    t:SetText(Username)
+    t:SetText("???")
+    Objs[i][1] = t
     Menu.add(t, -5)
 
     local t = TextLabel(Font)
@@ -89,17 +86,30 @@ for i=1, 20 do
     t.Position = Vector2(X + Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*Y)
     t.Scale = 0.8
     t.Color = C
-    t:SetText(Score)
+    Objs[i][2] = t
+    t:SetText("x pts")
     Menu.add(t, -5)
 end
 
 -- // Runners
 
 function Menu.open()
-    Controls.bind(Input.player1.button1, function(isDown)
-        if not isDown then return end
-        Renderer.changeScreen(Screen.get("Title"))
-    end)
+    for i=1,6 do
+        Controls.bind(Input.player1["button" .. i], function(isDown)
+            if not isDown then return end
+            Renderer.changeScreen(Screen.get("Title"))
+        end)
+    end
+    
+    local file = io.open("highscore", "r")
+    local Data = file:read("*all")
+    local DataTbl = split(Data, "\n")
+    file:close()
+    
+    for i,v in pairs(DataTbl) do
+        Objs[i][1]:SetText(string.sub(v, 1, 3))
+        Objs[i][2]:SetText(string.sub(v, 5) .. " pts")
+    end
 end
 
 function Menu.update(dt)
@@ -111,7 +121,10 @@ function Menu.update(dt)
 end
 
 function Menu.cleanup()
-    Controls.unbind(Input.player1.button1)
+    for i=1,6 do
+        Controls.unbind(Input.player1["button" .. i])
+    end
+    
 end
 
 return Menu

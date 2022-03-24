@@ -19,7 +19,7 @@ local TweenService = require("src/libs/Tween")
 local DelayService = require("src/libs/Delay")
 
 -- // Mandatory screen declaration
-Menu = Screen.new()
+local Menu = Screen.new()
 
 -- // Settings | DEFAULT SETTINGS
 Menu.GamesBeforeSpeedup = 5 -- How much game before we spice the game up !
@@ -269,13 +269,13 @@ function Intro()
     if curBeat == 0 then
         MainText:SetText("BIENVENUE DANS CURSEDWAVE !")
     elseif curBeat == 6 then
-        MainText:SetText("LE BUT DU JEU EST DE SURVIVRE\n LE PLUS LONGTEMP POSSIBLE")
+        MainText:SetText("LE BUT DU JEU EST DE PROGRESSER\n            LE PLUS LOIN POSSIBLE")
     elseif curBeat == 12 then
-        MainText:SetText("TOUT LES " .. Menu.GamesBeforeSpeedup .. " JEUX\nLA DIFFICULTE AUGMENTERA")
+        MainText:SetText("        TOUT LES " .. Menu.GamesBeforeSpeedup .. " JEUX\nLA DIFFICULTE AUGMENTERA")
     elseif curBeat == 18 then
-        MainText:SetText("VOUS POSSEDER " .. Menu.NumberOfLives .. " VIES\n0 VIE ET C'EST LE GAME OVER")
+        MainText:SetText("        VOUS POSSEDER " .. Menu.NumberOfLives .. " VIES\n      LA PARTIE PRENDRA FIN SI \nUN JOUEUR PERD TOUTE SES VIES")
     elseif curBeat == 24 then
-        MainText:SetText("SUIVEZ LES INSTRUCTIONS POUR\nGAGNER LES DIFFERENTS JEUX")
+        MainText:SetText("SUIVEZ LES INSTRUCTIONS POUR\n GAGNER LES DIFFERENTS JEUX")
         Controls.unbind("f") -- Unbind skip here, as we don't wanna skip anymore at this point.
     elseif curBeat == 30 then
         MainText:SetText("BONNE CHANCE !")
@@ -487,7 +487,14 @@ function EndGame()
             if not isDown then return end
             Controls.unbind("f")
             sfx:stop()
-            Renderer.changeScreen(Screen.get("Title"))
+            if Menu.ScoreEnabled then
+                local s = Screen.get("SubmitScore")
+                s.ScoreToSave = math.ceil((Menu.GAME.Rounds-1) * Menu.ScoreMultiplier)
+                Renderer.changeScreen(s)
+            else
+                Renderer.changeScreen(Screen.get("Title"))
+            end
+            
         end)
     end)
 end
