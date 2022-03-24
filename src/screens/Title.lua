@@ -30,17 +30,18 @@ Menu.add(SquareOne)
 local Buttons = {
     ["Play"] = Image("assets/imgs/Buttons/JOUER.png"),
     ["Credits"] = Image("assets/imgs/Buttons/CREDIT.png"),
+    ["Scores"] = Image("assets/imgs/Buttons/SCORE.png"),
     ["Quit"] = Image("assets/imgs/Buttons/QUITTER.png"),
 }
 
-local Order = {"Play", "Credits", "Quit"}
+local Order = {"Play", "Scores", "Credits", "Quit"}
 local Selected = 1
 
 local num = 0
 for i,ButtonName in pairs(Order) do
     local v = Buttons[ButtonName]
-    v.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*(.5 + i * .125))
-    v.Size = Vector2(400, 150)
+    v.Position = Vector2(Renderer.ScreenSize.X*.5, Renderer.ScreenSize.Y*(.5 + i * .1))
+    v.Size = Vector2(350, 125)
     v.Anchor = Vector2(.5, .5)
     v.Color = ColorNonSelected
     Menu.add(v)
@@ -59,7 +60,7 @@ local function SelectionChanged(old)
     o:play()
 
     local Button = Buttons[Order[old]]
-    Button.Size = Vector2(400, 150)
+    Button.Size = Vector2(350, 125)
     Button.Color = ColorNonSelected
 
     Button = Buttons[Order[Selected]]
@@ -81,6 +82,10 @@ functions["Play"] = function()
     Renderer.changeScreen(Screen.get("Selection"))
 end
 
+functions["Scores"] = function() 
+    Renderer.changeScreen(Screen.get("Scores"))
+end
+
 functions["Credits"] = function() 
     Renderer.changeScreen(Screen.get("Credits"))
 end
@@ -100,14 +105,14 @@ function Menu.open()
     Controls.bind(Input.player1.up, function(isDown)
         if not isDown then return end
         local oldS = Selected
-        Selected = (Selected + 1) % 3 + 1
+        Selected = (Selected + 2) % #Order + 1
         SelectionChanged(oldS)
     end)
 
     Controls.bind(Input.player1.down, function(isDown)
         if not isDown then return end
         local oldS = Selected
-        Selected = (Selected) % 3 + 1
+        Selected = (Selected) % #Order + 1
         SelectionChanged(oldS)
     end)
 
@@ -120,7 +125,7 @@ end
 function Menu.update(dt)
     dDelta = dDelta + dt
     local Button = Buttons[Order[Selected]]
-    Button.Size = Vector2(400 + math.sin(dDelta*5)*100, 150 - math.sin(dDelta*5)*25)
+    Button.Size = Vector2(350 + math.sin(dDelta*5)*100, 125 - math.sin(dDelta*5)*10)
     Button.Color = ColorSelected
 
     -- LOGS
