@@ -13,6 +13,7 @@ local Renderer = require("src/libs/Rendering/Renderer")
 local LogManager = require("src/libs/Debug/LogManager")
 local Controls = require("src/libs/Controls")
 local Instance = require("src/libs/Instance")
+local Input = require("src/libs/Input")
 
 local TweenService = require("src/libs/Tween")
 local DelayService = require("src/libs/Delay")
@@ -38,9 +39,9 @@ Menu.Musics = {
     ["Stages/aNewDay.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 2, BaseVolume = 1, BPM = 114},
     --["Stages/Discover.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 4, BaseVolume = 1, BPM = 114},
     --["Stages/Discover.mp3"] = {Name = "Head Body", Author = "VHS", Stage = 4, BaseVolume = 1, BPM = 114},
-    ["Stages/goreshit-pixel-rapist.mp3"] = {Name = "Pixel Rapist", Author = "Goreshit", Stage = 6, BaseVolume = 1, BPM = 200},
-    ["Stages/Genocide.ogg"] = {Name = "Genocide", Author = "Unknown", Stage = 6, BaseVolume = 1, BPM = 213},
-    ["Stages/a.mp3"] = {Name = "Genocide", Author = "Unknown", Stage = 6, BaseVolume = 1, BPM = 213}
+    ["Stages/goreshit-pixel-rapist.mp3"] = {Name = "Pixel Rapist", Author = "Goreshit", Stage = 5, BaseVolume = 1, BPM = 200},
+    ["Stages/Genocide.ogg"] = {Name = "Genocide", Author = "Unknown", Stage = 5, BaseVolume = 1, BPM = 213},
+    ["Stages/a.mp3"] = {Name = "Genocide", Author = "Unknown", Stage = 5, BaseVolume = 1, BPM = 213}
 }
 
 -- These settings below shouldn't be modified on runtime
@@ -521,9 +522,10 @@ function Menu.open()
     Menu.GAME.StageMusic.Source:play()
 
     FadeMusic(1, 1)
-    Controls.bind("f", function(isDown)
+
+    Controls.bind(Input.player1.button1, function(isDown)
         if not isDown then return end
-        Controls.unbind("f")
+        Controls.unbind(Input.player1.button1)
         skip_intro()
     end)
 end

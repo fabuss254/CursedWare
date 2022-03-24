@@ -11,6 +11,7 @@ local Renderer = require("src/libs/Rendering/Renderer")
 local LogManager = require("src/libs/Debug/LogManager")
 local Controls = require("src/libs/Controls")
 local Instance = require("src/libs/Instance")
+local Input = require("src/libs/Input")
 
 -- Settings
 Menu = Screen.new()
@@ -90,41 +91,21 @@ function Menu.open()
 
     -- Binds
 
-    Controls.bind("up", function(isDown)
-        if not isDown then return end
-        local oldS = Selected
-        print("SELS")
-        Selected = (Selected - 2) % (#Order) + 1
-        SelectionChanged(oldS)
-    end)
-
-    Controls.bind("o", function(isDown)
+    Controls.bind(Input.player1.up, function(isDown)
         if not isDown then return end
         local oldS = Selected
         Selected = (Selected - 2) % (#Order) + 1
         SelectionChanged(oldS)
     end)
 
-    Controls.bind("down", function(isDown)
+    Controls.bind(Input.player1.down, function(isDown)
         if not isDown then return end
         local oldS = Selected
         Selected = (Selected) % (#Order) + 1
         SelectionChanged(oldS)
     end)
 
-    Controls.bind("l", function(isDown)
-        if not isDown then return end
-        local oldS = Selected
-        Selected = (Selected) % (#Order) + 1
-        SelectionChanged(oldS)
-    end)
-
-    Controls.bind("f", function(isDown)
-        if not isDown then return end
-        OnClick()
-    end)
-
-    Controls.bind("q", function(isDown)
+    Controls.bind(Input.player1.button1, function(isDown)
         if not isDown then return end
         OnClick()
     end)

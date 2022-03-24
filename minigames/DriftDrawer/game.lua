@@ -26,7 +26,7 @@ end
 
 -- // MINIGAME SETTINGS (STATIC PUBLIC)
 module.Name = "Drift Drawer" -- Name of the game
-module.IsActive = false -- Can this game be rolled?
+module.IsActive = true -- Can this game be rolled?
 
 -- // PRIVATE VARIABLES (STATIC)
 local ZeroVector = Vector2()
