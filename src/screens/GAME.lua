@@ -30,6 +30,8 @@ Menu.MusicSpeedMult = .25 -- How much will the music's speed increase each stage
 Menu.NumberOfLives = 3 -- If you fall at 0, it's the end!
 Menu.NumberOfPlayers = 1 -- Number of players
 
+Menu.ScoreEnabled = true
+Menu.ScoreMultiplier = 1 -- Score multiplier (score is rounded to highest integer)
 Menu.StartSpeed = 1 -- Default speed
 Menu.StartDifficulty = 1 -- Default difficulty
 
@@ -124,11 +126,16 @@ local Game_Started = false
 local NextStep, Minigames, InTransition, LastGame
 
 -- // Functions
+function isMultiplayer()
+    return Menu.NumberOfPlayers > 1
+end
+
 function getMinigames()
     local Minigames = {}
     for _,v in pairs(love.filesystem.getDirectoryItems("minigames/")) do
         local mod = require("minigames/" .. v .. "/game")
-        if mod.IsActive then
+        local multi = isMultiplayer()
+        if mod.IsActive and (not multi or (not mod.MultiplayerDisabled)) then
             mod.Directory = "minigames/" .. v
             Minigames[v] = mod
         end
@@ -146,11 +153,11 @@ function ChooseMinigame()
     end
 
     local newGame = o[math.random(1, #o)]
-    while lastGame and newGame == lastGame do
+    while LastGame and newGame == LastGame do
         newGame = o[math.random(1, #o)]
     end
 
-    local LastGame = newGame
+    LastGame = newGame
     return Minigames[newGame]
 end
 
@@ -448,7 +455,7 @@ function EndGame()
             sfx:setVolume(1)
             sfx:play()
 
-            MainText:SetText("FIN DE LA PARTIE!\n       SCORE " .. Menu.GAME.Rounds-1)
+            MainText:SetText("FIN DE LA PARTIE!\n       SCORE " .. math.ceil((Menu.GAME.Rounds-1) * Menu.ScoreMultiplier))
         else
             if Menu.GAME.LifePlayer1 > 0 or Menu.GAME.LifePlayer2 > 0 then
                 sfx = love.audio.newSource("/assets/sounds/Victory.mp3", "static")
@@ -462,9 +469,9 @@ function EndGame()
 
             DelayService.new(1.2, function()
                 if Menu.GAME.LifePlayer1 > 0 or Menu.GAME.LifePlayer2 > 0 then
-                    MainText:SetText("GAGNANT JOUEUR " .. (Menu.GAME.LifePlayer1 > 0 and "1" or "2") .. "!\n         SCORE " .. Menu.GAME.Rounds-1)
+                    MainText:SetText("GAGNANT JOUEUR " .. (Menu.GAME.LifePlayer1 > 0 and "1" or "2") .. "!\n         SCORE " .. math.ceil((Menu.GAME.Rounds-1) * Menu.ScoreMultiplier))
                 else
-                    MainText:SetText(" EX AEQUO!\n  SCORE " .. Menu.GAME.Rounds-1)
+                    MainText:SetText(" EX AEQUO!\n  SCORE " .. math.ceil((Menu.GAME.Rounds-1) * Menu.ScoreMultiplier))
                 end
             end)
             MainText:SetText("...")

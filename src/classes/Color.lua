@@ -24,6 +24,10 @@ class.White = class(1, 1, 1)
 class.Black = class(0, 0, 0)
 
 -- METHODS
+function class.fromRGB(R,G,B)
+    return class(R/255, G/255, B/255)
+end
+
 function class.fromHSV(H, S, V, A)
     H = H * 360
 

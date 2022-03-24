@@ -108,7 +108,6 @@ function module:update_verre()
     local choix_type = -1
     
     if (time > tps_entre_spawn_verre*tour) and (tour < nbr_verre_a_remplir) then
-        print("Tour ", tour)
         tour = tour + 1
         random_pos = math.random(1, 4)
         while (place_verre[random_pos] == 0) == false do
@@ -126,6 +125,8 @@ function module:update_verre()
             place_verre[random_pos] = 3
         end
         tab_verre_vide[choix_type].Position = Vector2(tabPosX[random_pos] - decalage_verre, hauteur_verre)
+        tab_verre_vide[choix_type].Size = Vector2(7 * 5 * coefTailleBouteille, 9 * 5 * coefTailleBouteille)
+        TweenService.new(.5/self.GameSpeed, tab_verre_vide[choix_type].Size, {X = 7 * coefTailleBouteille, Y = 9 * coefTailleBouteille}, "outCubic"):play()
     end
 end
 
@@ -329,7 +330,7 @@ function module:Setup()
     self.BindKey("Button1", function (Began)
         self.bouteille_vin.Coule.On = Began and 1 or 0
     end)
-    self.BindKey("Button2", function (Began)
+    self.BindKey("Button3", function (Began)
         self.bouteille_vdk.Coule.On = Began and 1 or 0
     end)
     

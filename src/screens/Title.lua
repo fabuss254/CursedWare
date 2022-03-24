@@ -78,7 +78,7 @@ local function OnClick()
 end
 
 functions["Play"] = function() 
-    Renderer.changeScreen(Screen.get("GAME"))
+    Renderer.changeScreen(Screen.get("Selection"))
 end
 
 functions["Credits"] = function() 

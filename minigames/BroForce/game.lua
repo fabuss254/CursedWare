@@ -133,7 +133,6 @@ function module:Update(dt)
     dt = dt * self.GameSpeed -- Quick way to speed up the game if you're managing character velocity for example
 
     self.Sprite.Size = Linear(self.Sprite.Size, OriginalSize * self.SSize, dt/0.25)
-    print(self.SSize, self.Sprite.Size)
 
     -- This is an example, If we have 1s left and he's the player1, we say he succeeded
     if self.point >= 7 then
