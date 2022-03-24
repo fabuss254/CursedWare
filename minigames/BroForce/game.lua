@@ -1,3 +1,4 @@
+-- Game made by VERBRUGGHE Alexi
 -- // LIBS
 local Vector2 = require("src/classes/Vector2")
 local Color = require("src/classes/Color")

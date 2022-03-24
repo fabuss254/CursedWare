@@ -1,3 +1,4 @@
+-- Game made by LINEZ Guillaume
 -- // LIBS
 local Vector2 = require("src/classes/Vector2")
 local Color = require("src/classes/Color")
@@ -74,7 +75,7 @@ end
 
 -- Should return the string that tell what to do (RUN AFTER SETUP !)
 function module:GetObjective()
-    return "  Remplis les shot avec de la vodka  \n  et les verre a pied avec du vin  \n"
+    return "  Remplis les shot avec de la vodka  \n     et les verre a pied avec du vin  \n"
 end
 
 -- Should return the time the player is given to finish this minigame
