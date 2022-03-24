@@ -152,13 +152,17 @@ function ChooseMinigame()
         table.insert(o, i)
     end
 
-    local newGame = o[math.random(1, #o)]
-    while LastGame and newGame == LastGame do
-        newGame = o[math.random(1, #o)]
-    end
+    if #o == 1 then
+        return Minigames[o[1]]
+    else
+        local newGame = o[math.random(1, #o)]
+        while LastGame and newGame == LastGame do
+            newGame = o[math.random(1, #o)]
+        end
 
-    LastGame = newGame
-    return Minigames[newGame]
+        LastGame = newGame
+        return Minigames[newGame]
+    end
 end
 
 function getCurrentMusic(Stage)

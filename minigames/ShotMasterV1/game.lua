@@ -79,8 +79,7 @@ end
 
 -- Should return the time the player is given to finish this minigame
 function module:GetTime()
-    init = os.clock()
-    return 20/self.GameSpeed
+    return 12/self.GameSpeed
 end
 
 -- 2 player compatibility, You can retrieve the objective from the other minigame and put it into this one
@@ -103,7 +102,7 @@ end
 
 function module:update_verre()
     local nbr_verre_a_remplir = 4
-    local tps_entre_spawn_verre = (20/self.GameSpeed)/nbr_verre_a_remplir
+    local tps_entre_spawn_verre = self:GetTime()/nbr_verre_a_remplir
     local random_pos = -1
     local choix_type = -1
     
@@ -111,10 +110,12 @@ function module:update_verre()
         tour = tour + 1
         random_pos = math.random(1, 4)
         while (place_verre[random_pos] == 0) == false do
+            print(1)
             random_pos = math.random(1, 4)
         end
         choix_type = math.random(1, 4)
         while (verre_passe[choix_type] == true) do
+            print(2)
             choix_type = math.random(1, 4)
         end
         verre_passe[choix_type] = true
@@ -165,6 +166,7 @@ function module:update_position(dt)
             local random_new_pos = math.random(1, 4)
             place_verre[posBouteille] = 0
             while place_verre[random_new_pos] ~= 0 do
+                print(4)
                 random_new_pos = (random_new_pos + 1)%4
             end
             if random_new_pos ~= posBouteille then
@@ -194,6 +196,7 @@ function module:update_position(dt)
             local random_new_pos = math.random(1, 4)
             place_verre[posBouteille] = 0
             while place_verre[random_new_pos] ~= 0 do
+                print(5)
                 random_new_pos = (random_new_pos + 1)%4
             end
             if random_new_pos ~= posBouteille then
@@ -327,10 +330,10 @@ function module:Setup()
         self.bouteille_vdk.MoveDirection.A = Began and 1 or 0
         self.bouteille_vin.MoveDirection.A = Began and 1 or 0
     end)
-    self.BindKey("Button1", function (Began)
+    self.BindKey("Button3", function (Began)
         self.bouteille_vin.Coule.On = Began and 1 or 0
     end)
-    self.BindKey("Button3", function (Began)
+    self.BindKey("Button1", function (Began)
         self.bouteille_vdk.Coule.On = Began and 1 or 0
     end)
     
@@ -350,8 +353,9 @@ end
 -- This is where you update stuff. That's it...
 function module:Update(dt)
     local GAME = self.GAME
+    time = time + dt
     dt = dt * self.GameSpeed
-    time = os.clock() - init
+    
     self:desaparitionVerre()
     self:update_position()
     self:update_verre()
