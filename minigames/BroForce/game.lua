@@ -54,7 +54,7 @@ end
 
 -- Should return the string that tell what to do (RUN AFTER SETUP !)
 function module:GetObjective()
-    return "Fais 7 mouvements\n vers " ..self.Movement
+    return "Fais 7 mouvements\n    vers " ..self.Movement
 end
 
 -- Should return the time the player is given to finish this minigame

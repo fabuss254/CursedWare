@@ -4,12 +4,12 @@ return {
         ["down"] = "down",
         ["right"] = "right",
         ["left"] = "left",
-        button1 = "f",
-        button2 = "r",
-        button3 = "g",
-        button4 = "t",
-        button5 = "h",
-        button6 = "y",
+        button1 = {"1", "f"},
+        button2 = {"4", "r"},
+        button3 = {"2", "g"},
+        button4 = {"5", "t"},
+        button5 = {"3", "h"},
+        button6 = {"6", "y"},
     },
 
     player2 = {

@@ -128,12 +128,9 @@ function Menu.cleanup()
         v.Color = ColorNonSelected
     end
 
-    Controls.unbind("up")
-    Controls.unbind("o")
-    Controls.unbind("down")
-    Controls.unbind("l")
-    Controls.unbind("f")
-    Controls.unbind("q")
+    Controls.unbind(Input.player1.down)
+    Controls.unbind(Input.player1.up)
+    Controls.unbind(Input.player1.button1)
 end
 
 return Menu

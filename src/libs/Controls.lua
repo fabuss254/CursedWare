@@ -14,6 +14,12 @@ function module.isHolding(key)
 end
 
 function module.bind(key, callback)
+    if type(key) == "table" then
+        for _,v in pairs(key) do
+            module.bind(v, callback)
+        end
+        return
+    end
     if not binds[key] then binds[key] = {} end
 
     -- Set the key's connection and a disconnection function so we can disconnect it anytime.
@@ -29,6 +35,12 @@ function module.bind(key, callback)
 end
 
 function module.unbind(key)
+    if type(key) == "table" then
+        for _,v in pairs(key) do
+            module.unbind(v)
+        end
+        return
+    end
     if not binds[key] then return end
     
     binds[key] = {}

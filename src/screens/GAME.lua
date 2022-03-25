@@ -52,17 +52,17 @@ local TextGood = Color(66/255, 1, 98/255)
 local TextBad = Color(1, 66/255, 66/255)
 
 local Keybinds = {
-    up = {"up", "o"},
-    down = {"down", "l"},
-    right = {"right", "m"},
-    left = {"left", "k"},
+    up = {Input.player1.up, Input.player2.up},
+    down = {Input.player1.down, Input.player2.down},
+    right = {Input.player1.right, Input.player2.right},
+    left = {Input.player1.left, Input.player2.left},
 
-    button1 = {"f", "q"},
-    button2 = {"r", "a"},
-    button3 = {"g", "s"},
-    button4 = {"t", "z"},
-    button5 = {"h", "d"},
-    button6 = {"y", "e"},
+    button1 = {Input.player1.button1, Input.player2.button1},
+    button2 = {Input.player1.button2, Input.player2.button2},
+    button3 = {Input.player1.button3, Input.player2.button3},
+    button4 = {Input.player1.button4, Input.player2.button4},
+    button5 = {Input.player1.button5, Input.player2.button5},
+    button6 = {Input.player1.button6, Input.player2.button6},
 }
 
 -- // Objects
@@ -451,6 +451,8 @@ function EndGame()
     popScreenOUT()
     MainText:SetText("...")
 
+    Minigames = nil
+    
     local sfx
     DelayService.new(3, function()
         if Menu.NumberOfPlayers == 1 then
@@ -483,9 +485,9 @@ function EndGame()
     end)
 
     DelayService.new(6, function()
-        Controls.bind("f", function(isDown)
+        Controls.bind(Input.player1.button1, function(isDown)
             if not isDown then return end
-            Controls.unbind("f")
+            Controls.unbind(Input.player1.button1)
             sfx:stop()
             if Menu.ScoreEnabled then
                 local s = Screen.get("SubmitScore")
@@ -529,6 +531,9 @@ function Menu.open()
         Menu.add(Heart2, 99999997)
         Menu.add(Heart2.Text, 99999998)
         Heart2.Text:SetText(Menu.NumberOfLives)
+    else
+        Menu.rem(Heart2)
+        Menu.rem(Heart2.Text)
     end
 
     Menu.GAME.StageMusic = getCurrentMusic(Stage)
@@ -656,7 +661,7 @@ function Menu.update(dt)
 end
 
 function Menu.cleanup()
-    Controls.unbind("f")
+    Controls.unbind(Input.player1.button1)
 end
 
 return Menu
