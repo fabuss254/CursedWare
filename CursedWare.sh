@@ -1,2 +1,3 @@
 #!/bin/bash
-love ./projet/CursedWare
+cd projet/CursedWare
+love .

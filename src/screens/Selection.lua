@@ -25,7 +25,7 @@ local Definition = {
         Default = 1,
         Items = {
             {"Solo", "Jouer tout seul.", function(v) v.NumberOfPlayers = 1 end},
-            {"Versus", "Jouer contre quelqu'un. (désactive le tableau des scores)", function(v) v.NumberOfPlayers = 2 end}
+            {"Versus", "Jouer contre quelqu'un. (désactive le tableau des scores)", function(v) v.NumberOfPlayers = 2 v.ScoreEnabled = false end}
         }
     },
     {
