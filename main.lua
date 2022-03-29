@@ -1,5 +1,6 @@
 -- ⚠️⚠️⚠️ - L'éxecution de Love2D à une importance pour la sauvegarde des highscores. Si le cd de la console ne point pas vers le fichier du jeu. Le jeu crashera à la sauvegarde. 
 -- Conseil: Créer un fichier .bat comme ceci -> cd [CHEMIN VERS LE DOSSIER DU JEU] && "[CHEMIN VERS LOVE2D.exe]" .
+-- et executez le fichier pour lancer le jeu.
 
 -- Libs
 local Vector2 = require("src/classes/Vector2")
